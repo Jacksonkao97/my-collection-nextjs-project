@@ -1,0 +1,39 @@
+{
+  "results": [
+    {
+      "id": "1",
+      "name": "My Collection 1",
+      "numberOfItems": 10,
+      "creationDate": "2024-04-04T12:00:00.000Z",
+      "lastUpdated": "2024-04-04T12:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "My Collection 2",
+      "numberOfItems": 20,
+      "creationDate": "2024-04-04T12:00:00.000Z",
+      "lastUpdated": "2024-04-04T12:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "name": "My Collection 3",
+      "numberOfItems": 30,
+      "creationDate": "2024-04-04T12:00:00.000Z",
+      "lastUpdated": "2024-04-04T12:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "name": "My Collection 4",
+      "numberOfItems": 40,
+      "creationDate": "2024-04-04T12:00:00.000Z",
+      "lastUpdated": "2024-04-04T12:00:00.000Z"
+    },
+    {
+      "id": "5",
+      "name": "My Collection 5",
+      "numberOfItems": 50,
+      "creationDate": "2024-04-04T12:00:00.000Z",
+      "lastUpdated": "2024-04-04T12:00:00.000Z"
+    }
+  ]
+}

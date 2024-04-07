@@ -19,7 +19,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   console.log("GET /api/collections")
   try {
     console.log("Reading the json...")
-    const json = fs.readFileSync('../../fakeData/fakeCollections.json', 'utf-8')
+    const json = fs.readFileSync('src/app/fakeData/fakeCollections.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
 
     console.log("Sending data...")
@@ -54,12 +54,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     console.log('Adding new collection:', newCollection)
-    const json = fs.readFileSync('../../fakeData/fakeCollections.json', 'utf-8')
+    const json = fs.readFileSync('src/app/fakeData/fakeCollections.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     data.results.push(newCollection)
 
     console.log('Writing to file...')
-    fs.writeFileSync('../../fakeData/fakeCollections.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync('src/app/fakeData/fakeCollections.json', JSON.stringify(data, null, 2))
 
     console.log('Sending response...')
     return NextResponse.json({}, { status: 201 })
@@ -80,7 +80,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
     console.log("Received data:", body)
 
     console.log('Updating collection:', body)
-    const json = fs.readFileSync('../../fakeData/fakeCollections.json', 'utf-8')
+    const json = fs.readFileSync('src/app/fakeData/fakeCollections.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     const index = data.results.findIndex(collection => collection.id === body.id)
     if (index === -1) {
@@ -90,7 +90,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
     data.results[index] = body
 
     console.log('Writing to file...')
-    fs.writeFileSync('../../fakeData/fakeCollections.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync('src/app/fakeData/fakeCollections.json', JSON.stringify(data, null, 2))
 
     console.log('Sending response...')
     return NextResponse.json({}, { status: 200 })
@@ -111,7 +111,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     console.log("Received data:", body)
 
     console.log('Deleting collection:', body)
-    const json = fs.readFileSync('../../fakeData/fakeCollections.json', 'utf-8')
+    const json = fs.readFileSync('src/app/fakeData/fakeCollections.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     const index = data.results.findIndex(collection => collection.id === body.id)
     if (index === -1) {
@@ -121,7 +121,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     data.results.splice(index, 1)
 
     console.log('Writing to file...')
-    fs.writeFileSync('../../fakeData/fakeCollections.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync('src/app/fakeData/fakeCollections.json', JSON.stringify(data, null, 2))
 
     console.log('Sending response...')
     return NextResponse.json({}, { status: 200 })

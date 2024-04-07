@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import DeleteCollectionButton from './DeleteCollectionButton'
 import NoImageIcon from '../../../public/no-image-svgrepo-com.svg'
 import Collection from '../model/collectionModel.d'
 
@@ -10,7 +11,10 @@ interface CollectionCardProps {
 
 const CollectionCard = (props: CollectionCardProps) => {
   return (
-    <div className="card w-collection_card h-collection_card glass">
+    <div className="card w-collection_card h-collection_card glass group focus:ring-2 focus:ring-sky-500" tabIndex={0}>
+      <div className='absolute top-5 right-5 opacity-0 transition duration-300 ease-in-out group-hover:opacity-100 group-hover:z-10 group-focus:opacity-100'>
+        <DeleteCollectionButton collection={props.item} />
+      </div>
       <figure>
         <Image
           style={{ objectFit: 'contain', position: 'relative', width: '100%', height: '200px' }}

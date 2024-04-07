@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import AddCollectionBox from './AddCollectionBox'
+import AddCollectionModel from './AddCollectionModel'
 
 const AddCollectionButton = () => {
 
@@ -13,7 +13,7 @@ const AddCollectionButton = () => {
     <div className='flex flex-col justify-center content-center w-collection_card h-collection_card'>
       <button className="btn btn-lg" onClick={handleOnCreate}>Add Collection</button>
       <dialog id="create_collection" className="modal">
-        <AddCollectionBox />
+        <AddCollectionModel />
       </dialog>
     </div>
   )

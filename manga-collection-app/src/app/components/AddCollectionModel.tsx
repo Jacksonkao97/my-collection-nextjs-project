@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 
-const AddCollectionBox = () => {
+const AddCollectionModel = () => {
   const [collectionName, setCollectionName] = useState('' as string)
 
   const postCollection = async () => {
@@ -52,6 +52,10 @@ const AddCollectionBox = () => {
   return (
     <>
       <div className='modal-box w-80 md:w-96 flex flex-col gap-6'>
+        <form method="dialog">
+          {/* if there is a button in form, it will close the modal */}
+          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setCollectionName('')}>✕</button>
+        </form>
         <label>Image for the collection:</label>
         <input type="file" className="file-input file-input-bordered w-full" />
         <label>The Collection name:</label>
@@ -71,4 +75,4 @@ const AddCollectionBox = () => {
   )
 }
 
-export default AddCollectionBox
+export default AddCollectionModel

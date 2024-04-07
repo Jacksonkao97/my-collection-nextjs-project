@@ -5,31 +5,25 @@ const AddCollectionModel = () => {
   const [collectionName, setCollectionName] = useState('' as string)
 
   const postCollection = async () => {
-    try {
-      const body = {
-        name: collectionName
-      }
-      await fetch(process.env.COLLECTION_API_URL!, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      })
-        .then(async (res) => {
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
-          }
-        })
-        .catch(err => {
-          console.error(err.message)
-          throw new Error('Error in creating new collection')
-        })
-
-    } catch (error) {
-      console.error("Error in creating new collection", error)
-      throw new Error('Error in creating new collection')
+    const body = {
+      name: collectionName
     }
+    await fetch(process.env.COLLECTION_API_URL!, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+        }
+      })
+      .catch(err => {
+        console.error(err.message)
+        throw new Error('Error in creating new collection')
+      })
   }
 
   const handleOnCreate = async () => {

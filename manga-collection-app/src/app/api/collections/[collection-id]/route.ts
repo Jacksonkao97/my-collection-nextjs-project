@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 // third parties imports
 import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 
 // local imports
 import CollectionItem from "@/app/model/collectionItemModel";
 
 type RequestParams = {
-  collectionId: string
+  "collection-id": string
 }
 
 type JSONData = {
@@ -18,14 +19,14 @@ type JSONData = {
 }
 
 export async function GET(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
-  console.log(`GET /api/collections/[${params.collectionId}]`)
+  console.log(`GET /api/collections/[${params["collection-id"]}]`)
   try {
-    const collectionId = params.collectionId
+    const collectionId = params["collection-id"]
 
     console.log("Reading the json...")
-    const json = fs.readFileSync('../../../fakeData/fakeCollectionItem.json', 'utf-8')
+    const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
-    const collectionItems = data.results.find(collection => collection.id === collectionId)?.data
+    const collectionItems: CollectionItem[] = data.results.find(collection => collection.id === collectionId)?.data || []
 
     console.log("Sending data...")
     return NextResponse.json({ data: collectionItems }, { status: 200 })
@@ -41,20 +42,34 @@ type CollectionPostRequest = {
 }
 
 export async function POST(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
-  console.log(`POST /api/collections/[${params.collectionId}]`)
+  console.log(`POST /api/collections/[${params["collection-id"]}]`)
   try {
-    const collectionId = params.collectionId
-    const body: CollectionPostRequest = await req.json()
+    const collectionId = params["collection-id"]
+    const body: { name: string } = await req.json()
     console.log("Received data:", body)
 
-    console.log('Adding new collection item:', body.data)
-    const json = fs.readFileSync('../../../fakeData/fakeCollectionItem.json', 'utf-8')
+    const collectionItem: CollectionItem = {
+      id: uuidv4(),
+      name: body.name,
+      creationDate: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+    }
+
+    console.log('Adding new collection item:', collectionItem)
+    const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collection = data.results.find(collection => collection.id === collectionId)
-    collection?.data.push(body.data)
+
+    if (!collection) {
+      console.log('Collection not found, creating new collection...')
+      data.results.push({ id: collectionId, data: [collectionItem] })
+    } else {
+      console.log('Collection found, adding to collection...')
+      collection?.data.push(collectionItem)
+    }
 
     console.log('Writing to json...')
-    fs.writeFileSync('../../../fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
 
     console.log("Sending data...")
     return NextResponse.json({}, { status: 200 })
@@ -66,9 +81,9 @@ export async function POST(req: NextRequest, { params }: { params: RequestParams
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
-  console.log(`DELETE /api/collections/[${params.collectionId}]`)
+  console.log(`DELETE /api/collections/[${params["collection-id"]}]`)
   try {
-    const collectionId = params.collectionId
+    const collectionId = params["collection-id"]
     const body: CollectionItem = await req.json()
     console.log("Received data:", body)
 
@@ -91,9 +106,9 @@ export async function DELETE(req: NextRequest, { params }: { params: RequestPara
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
-  console.log(`PATCH /api/collections/[${params.collectionId}]`)
+  console.log(`PATCH /api/collections/[${params["collection-id"]}]`)
   try {
-    const collectionId = params.collectionId
+    const collectionId = params["collection-id"]
     const body: CollectionItem = await req.json()
     console.log("Received data:", body)
 

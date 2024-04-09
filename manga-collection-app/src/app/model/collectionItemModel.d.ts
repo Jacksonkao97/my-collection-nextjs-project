@@ -1,8 +1,8 @@
 interface CollectionItem {
   id: string,
   name: string,
-  creationDate: Date,
-  lastUpdated: Date,
+  creationDate: string,
+  lastUpdated: string,
 }
 
 export default CollectionItem

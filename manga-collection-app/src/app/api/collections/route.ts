@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Collection from "../../model/collectionModel";
 
 
-type JSONData = {
+interface JSONData {
   results: Collection[]
 }
 
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   }
 }
 
-type CollectionPostRequest = {
+interface CollectionPostRequest {
   image?: string,
   name: string
 }

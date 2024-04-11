@@ -7,11 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
 // local imports
 import CollectionItem from "@/app/model/collectionItemModel";
 
-type RequestParams = {
+interface RequestParams {
   "collection-id": string
 }
 
-type JSONData = {
+interface JSONData {
   results: {
     id: string,
     data: CollectionItem[]
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest, { params }: { params: RequestParams 
   }
 }
 
-type CollectionPostRequest = {
+interface CollectionPostRequest {
   data: CollectionItem
 }
 
@@ -80,21 +80,31 @@ export async function POST(req: NextRequest, { params }: { params: RequestParams
   }
 }
 
+interface DeleteRequest {
+  id: string
+}
+
 export async function DELETE(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`DELETE /api/collections/[${params["collection-id"]}]`)
   try {
     const collectionId = params["collection-id"]
-    const body: CollectionItem = await req.json()
+    const body: DeleteRequest = await req.json()
     console.log("Received data:", body)
 
     console.log('Deleting collection item:', body)
-    const json = fs.readFileSync('../../../fakeData/fakeCollectionItem.json', 'utf-8')
+    const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collection = data.results.find(collection => collection.id === collectionId)
-    collection!.data = collection!.data.filter(collectionItem => collectionItem.id !== body.id)
+
+    if (!collection) {
+      console.log('Collection not found')
+      return NextResponse.json({ error: "Collection not found" }, { status: 404 })
+    }
+
+    collection.data = collection.data.filter(collectionItem => collectionItem.id !== body.id)
 
     console.log('Writing to json...')
-    fs.writeFileSync('../../../fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
 
     console.log("Sending data...")
     return NextResponse.json({}, { status: 200 })
@@ -105,22 +115,44 @@ export async function DELETE(req: NextRequest, { params }: { params: RequestPara
   }
 }
 
+interface PatchRequest {
+  id: string,
+  name?: string,
+  description?: string
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`PATCH /api/collections/[${params["collection-id"]}]`)
   try {
     const collectionId = params["collection-id"]
-    const body: CollectionItem = await req.json()
+    const body: PatchRequest = await req.json()
     console.log("Received data:", body)
 
     console.log('Updating collection item:', body)
-    const json = fs.readFileSync('../../../fakeData/fakeCollectionItem.json', 'utf-8')
+    const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collection = data.results.find(collection => collection.id === collectionId)
-    const index = collection!.data.findIndex(collectionItem => collectionItem.id === body.id)
-    collection!.data[index] = body
+
+    if (!collection) {
+      console.log('Collection not found')
+      return NextResponse.json({ error: "Collection not found" }, { status: 404 })
+    }
+
+    const index = collection.data.findIndex(item => item.id === body.id)
+
+    if (index === -1) {
+      console.log('Collection item not found')
+      return NextResponse.json({ error: "Collection item not found" }, { status: 404 })
+    } else {
+      collection.data[index] = {
+        ...collection.data[index],
+        name: body.name || collection.data[index].name,
+        description: body.description || collection.data[index].description
+      }
+    }
 
     console.log('Writing to json...')
-    fs.writeFileSync('../../../fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
 
     console.log("Sending data...")
     return NextResponse.json({}, { status: 200 })

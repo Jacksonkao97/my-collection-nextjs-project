@@ -1,7 +1,11 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+
+// Components
 import DeleteCollectionButton from './DeleteCollectionButton'
+
+// Assets
 import NoImageIcon from '../../../public/no-image-svgrepo-com.svg'
 import Collection from '../model/collectionModel.d'
 

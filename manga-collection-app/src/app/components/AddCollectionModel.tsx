@@ -4,41 +4,40 @@ import React, { useState } from 'react'
 const AddCollectionModel = () => {
   const [collectionName, setCollectionName] = useState('' as string)
 
-  const postCollection = async () => {
-    const body = {
-      name: collectionName
-    }
-    await fetch(process.env.COLLECTION_API_URL!, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
-        }
-      })
-      .catch(err => {
-        console.error(err.message)
-        throw new Error('Error in creating new collection')
-      })
-  }
+  const handleOnCreate = async (e: (HTMLButtonElement)) => {
+    e.disabled = true
 
-  const handleOnCreate = async () => {
     if (collectionName === '') {
       alert('Collection name cannot be empty')
+      e.disabled = false
       return
+
     } else {
-      await postCollection()
-        .then(() => {
+      const body = {
+        name: collectionName
+      }
+
+      await fetch(`${process.env.BASE_URL}/api/collections`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+          }
           setCollectionName('')
           const dialog = document.getElementById('create_collection') as HTMLDialogElement
           dialog.close()
         })
-        .catch(() => {
-          alert('Error in creating collection')
+        .catch(err => {
+          console.error(err.message)
+          throw new Error('Error in creating new collection')
+        })
+        .finally(() => {
+          e.disabled = false
         })
     }
   }
@@ -60,7 +59,7 @@ const AddCollectionModel = () => {
           value={collectionName}
           onChange={e => setCollectionName(e.currentTarget.value)}
         />
-        <button className='btn btn-sm' onClick={handleOnCreate}>Create</button>
+        <button className='btn btn-sm' onClick={(e) => handleOnCreate(e.currentTarget)}>Create</button>
       </div>
       <form method="dialog" className="modal-backdrop">
         <button onClick={() => setCollectionName('')}>close</button>

@@ -1,5 +1,7 @@
 'use client'
 import React from 'react'
+
+// Models
 import Collection from '../model/collectionModel'
 
 interface DeleteCollectionModelProps {
@@ -7,10 +9,11 @@ interface DeleteCollectionModelProps {
 }
 
 const DeleteCollectionModel = (props: DeleteCollectionModelProps) => {
+  const handleOnClick = async (e: HTMLButtonElement) => {
+    e.disabled = true
 
-  const handleOnClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (e.currentTarget.textContent === 'Yes') {
-      await fetch(process.env.COLLECTION_API_URL!, {
+    if (e.textContent === 'Yes') {
+      await fetch(`${process.env.BASE_URL}/api/collections`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
@@ -26,6 +29,11 @@ const DeleteCollectionModel = (props: DeleteCollectionModelProps) => {
           console.error(err.message)
           alert('Failed to delete collection')
         })
+        .finally(() => {
+          e.disabled = false
+        })
+    } else {
+      e.disabled = false
     }
   }
 
@@ -35,8 +43,8 @@ const DeleteCollectionModel = (props: DeleteCollectionModelProps) => {
         <form method="dialog" className='flex flex-col gap-10'>
           <h1>Are you sure you want to delete this Collection {props.collection.name}?</h1>
           <div className='flex flex-row justify-evenly'>
-            <button className='btn btn-sm' onClick={handleOnClick}>Yes</button>
-            <button className='btn btn-sm' onClick={handleOnClick}>No</button>
+            <button className='btn btn-sm' onClick={(e) => handleOnClick(e.currentTarget)}>Yes</button>
+            <button className='btn btn-sm' onClick={(e) => handleOnClick(e.currentTarget)}>No</button>
           </div>
         </form>
       </div>

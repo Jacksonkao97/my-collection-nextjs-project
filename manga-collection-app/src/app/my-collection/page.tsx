@@ -1,21 +1,24 @@
 import React from 'react'
-import CollectionCard from '../components/CollectionCard'
+
+// Models
 import Collection from '@/app/model/collectionModel.d'
+
+// Components
+import CollectionCard from '../components/CollectionCard'
 import AddCollectionButton from '../components/AddCollectionButton'
 
-type CollectionResponse = {
+interface FetchCollectionsResponse {
   data: Collection[]
 }
 
 const MyCollectionPage = async () => {
-
-  // Get collections from the server
-  const collections: Collection[] = await fetch(process.env.COLLECTION_API_URL!, { cache: 'no-cache' })
+  // Get list of collections
+  const collections: Collection[] = await fetch(`${process.env.BASE_URL}/api/collections`, { cache: 'no-cache' })
     .then(async (res) => {
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
       }
-      const data: CollectionResponse = await res.json()
+      const data: FetchCollectionsResponse = await res.json()
       return data.data
     })
     .catch(err => {

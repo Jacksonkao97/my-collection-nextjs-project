@@ -10,12 +10,15 @@ const AddItemModel = () => {
 
   const [itemName, setItemName] = useState('')
 
-  const handleOnAdd = async () => {
+  const handleOnAdd = async (e: HTMLButtonElement) => {
+    e.disabled = true
+
     if (!itemName) {
       alert('Please enter the item name')
+      e.disabled = false
       return
     } else {
-      await fetch(`${process.env.COLLECTION_API_URL}/${id}`, {
+      await fetch(`${process.env.BASE_URL}/api/collections/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -30,6 +33,9 @@ const AddItemModel = () => {
         .catch(err => {
           console.error(err.message)
           alert('Error in adding new item')
+        })
+        .finally(() => {
+          e.disabled = false
         })
       setItemName('')
       const dialog = document.getElementById('add_item') as HTMLDialogElement
@@ -54,7 +60,7 @@ const AddItemModel = () => {
           value={itemName}
           onChange={e => setItemName(e.currentTarget.value)}
         />
-        <button className='btn btn-sm' onClick={handleOnAdd}>Add</button>
+        <button className='btn btn-sm' onClick={(e) => handleOnAdd(e.currentTarget)}>Add</button>
       </div>
       <form method="dialog" className="modal-backdrop">
         <button onClick={() => setItemName('')}>close</button>

@@ -1,15 +1,18 @@
 import React from 'react'
-import CollectionItemTable from '@/app/components/CollectionItemTable'
+
+// Models
 import CollectionItem from '@/app/model/collectionItemModel'
+
+// Components
+import CollectionItemTable from '@/app/components/CollectionItemTable'
 
 interface searchParams {
   id: string,
 }
 
 const Collection = async ({ searchParams }: { searchParams: searchParams }) => {
-
   const collectionId = searchParams.id
-  const collectionTable: CollectionItem[] = await fetch(`${process.env.COLLECTION_API_URL}/${collectionId}`, { cache: 'no-cache' })
+  const collectionTable: CollectionItem[] = await fetch(`${process.env.BASE_URL}/api/collections/${collectionId}`, { cache: 'no-cache' })
     .then(async (res) => {
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)

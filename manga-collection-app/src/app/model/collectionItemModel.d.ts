@@ -3,6 +3,7 @@ interface CollectionItem {
   name: string,
   creationDate: string,
   lastUpdated: string,
+  description?: string,
 }
 
 export default CollectionItem

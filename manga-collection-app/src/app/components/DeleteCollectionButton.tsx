@@ -1,9 +1,13 @@
 'use client'
 import React from 'react'
 import Image from 'next/image'
+
+// Components
+import DeleteCollectionModel from './DeleteCollectionModel'
+
+// Assets
 import DeleteIcon from '../../../public/delete.png'
 import Collection from '../model/collectionModel'
-import DeleteCollectionModel from './DeleteCollectionModel'
 
 interface DeleteCollectionButtonProps {
   collection: Collection
@@ -12,7 +16,7 @@ interface DeleteCollectionButtonProps {
 const DeleteCollectionButton = (props: DeleteCollectionButtonProps) => {
 
   const handleOnDelete = () => {
-    const dialog = document.getElementById('delete_collection_'+props.collection.id) as HTMLDialogElement
+    const dialog = document.getElementById('delete_collection_' + props.collection.id) as HTMLDialogElement
     dialog.showModal()
   }
 

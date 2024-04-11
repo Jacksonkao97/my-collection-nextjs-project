@@ -1,5 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
+
+// Components
 import AddItemButton from '@/app/components/AddItemButton'
 
 const TableLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {

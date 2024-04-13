@@ -6,7 +6,7 @@ import NavBar from './components/NavBar';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "My Manga Collection Web App",
+  title: "Manga Collection Netxjs Project",
   description: "First Next.js app for my manga collection",
 };
 
@@ -16,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" data-theme="light">
+      <body className="flex flex-col p-2 gap-2">
         <header><NavBar /></header>
         <main>{children}</main>
       </body>

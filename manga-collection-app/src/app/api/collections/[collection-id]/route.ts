@@ -23,13 +23,13 @@ export async function GET(req: NextRequest, { params }: { params: RequestParams 
   try {
     const collectionId = params["collection-id"]
 
-    console.log("Reading the json...")
+    console.log("Reading the file...")
     const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collectionItems: CollectionItem[] = data.results.find(collection => collection.id === collectionId)?.data || []
 
     console.log("Sending data...")
-    return NextResponse.json({ data: collectionItems }, { status: 200 })
+    return NextResponse.json({ collectionTable: collectionItems }, { status: 200 })
 
   } catch (error) {
     console.error("Error in getting collection items from json", error)
@@ -37,16 +37,16 @@ export async function GET(req: NextRequest, { params }: { params: RequestParams 
   }
 }
 
-interface CollectionPostRequest {
-  data: CollectionItem
+interface PostRequest {
+  name: string,
 }
 
 export async function POST(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`POST /api/collections/[${params["collection-id"]}]`)
   try {
     const collectionId = params["collection-id"]
-    const body: { name: string } = await req.json()
-    console.log("Received data:", body)
+    const body: PostRequest = await req.json()
+    console.log("Received data...")
 
     const collectionItem: CollectionItem = {
       id: uuidv4(),
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest, { params }: { params: RequestParams
       lastUpdated: new Date().toISOString(),
     }
 
-    console.log('Adding new collection item:', collectionItem)
+    console.log('Reading the file...')
     const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collection = data.results.find(collection => collection.id === collectionId)
@@ -81,17 +81,20 @@ export async function POST(req: NextRequest, { params }: { params: RequestParams
 }
 
 interface DeleteRequest {
-  id: string
+  itemId: string
 }
 
+/**
+ * This function will delete the collection item
+ */
 export async function DELETE(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`DELETE /api/collections/[${params["collection-id"]}]`)
   try {
     const collectionId = params["collection-id"]
     const body: DeleteRequest = await req.json()
-    console.log("Received data:", body)
+    console.log("Received data...")
 
-    console.log('Deleting collection item:', body)
+    console.log('Reading the file...')
     const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collection = data.results.find(collection => collection.id === collectionId)
@@ -101,7 +104,8 @@ export async function DELETE(req: NextRequest, { params }: { params: RequestPara
       return NextResponse.json({ error: "Collection not found" }, { status: 404 })
     }
 
-    collection.data = collection.data.filter(collectionItem => collectionItem.id !== body.id)
+    console.log('Deleting collection item...')
+    collection.data = collection.data.filter(collectionItem => collectionItem.id !== body.itemId)
 
     console.log('Writing to json...')
     fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
@@ -116,19 +120,22 @@ export async function DELETE(req: NextRequest, { params }: { params: RequestPara
 }
 
 interface PatchRequest {
-  id: string,
+  itemId: string,
   name?: string,
   description?: string
 }
 
+/**
+ * This function will update the collection item
+ */
 export async function PATCH(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`PATCH /api/collections/[${params["collection-id"]}]`)
   try {
     const collectionId = params["collection-id"]
     const body: PatchRequest = await req.json()
-    console.log("Received data:", body)
+    console.log("Received data...")
 
-    console.log('Updating collection item:', body)
+    console.log('Reading the file...')
     const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collection = data.results.find(collection => collection.id === collectionId)
@@ -138,12 +145,13 @@ export async function PATCH(req: NextRequest, { params }: { params: RequestParam
       return NextResponse.json({ error: "Collection not found" }, { status: 404 })
     }
 
-    const index = collection.data.findIndex(item => item.id === body.id)
+    const index = collection.data.findIndex(item => item.id === body.itemId)
 
     if (index === -1) {
       console.log('Collection item not found')
       return NextResponse.json({ error: "Collection item not found" }, { status: 404 })
     } else {
+      console.log('Updating collection item...')
       collection.data[index] = {
         ...collection.data[index],
         name: body.name || collection.data[index].name,

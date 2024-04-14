@@ -43,6 +43,9 @@ const AddCollectionModel = () => {
         console.error(err.message)
         alert('Error in creating collection')
       })
+      .finally(() => {
+        e.disabled = false
+      })
   }
 
   /**

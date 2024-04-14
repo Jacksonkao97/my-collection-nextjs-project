@@ -5,7 +5,6 @@ import React from 'react'
 import AddItemModel from './AddItemModel'
 
 const AddItemButton = () => {
-
   const handleOnAddItem = () => {
     const dialog = document.getElementById('add_item') as HTMLDialogElement
     dialog.showModal()

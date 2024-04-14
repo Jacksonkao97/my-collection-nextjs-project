@@ -50,8 +50,8 @@ const AddItemModel = () => {
           {/* if there is a button in form, it will close the modal */}
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setItemName('')}>✕</button>
         </form>
-        <label>Image for the item:</label>
-        <input type="file" className="file-input file-input-bordered w-full" />
+        {/* <label>Image for the item:</label>
+        <input type="file" className="file-input file-input-bordered w-full" /> */}
         <label>The Item name:</label>
         <input
           type="text"

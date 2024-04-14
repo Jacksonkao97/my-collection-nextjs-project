@@ -26,6 +26,8 @@ const DeleteItemModel = (props: DeleteItemModelProps) => {
           if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
           }
+          const dialog = document.getElementById(`delete_Item_${props.itemId}`) as HTMLDialogElement
+          dialog.close()
         })
         .catch(err => {
           console.error(err.message)

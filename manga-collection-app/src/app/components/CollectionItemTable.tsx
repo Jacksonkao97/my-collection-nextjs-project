@@ -8,13 +8,13 @@ import EditItemButton from './EditItemButton'
 import DeleteItemButton from './DeleteItemButton'
 
 interface CollectionItemTableProps {
-  collectionTable: CollectionItem[]
+  table: CollectionItem[]
 }
 
 const CollectionItemTable = (props: CollectionItemTableProps) => {
   return (
     <>
-      {props.collectionTable.length === 0 ? <p>No items in collection</p> :
+      {props.table.length === 0 ? <p>No items in collection</p> :
         <div className="overflow-x-auto">
           <table className="table">
             <thead>
@@ -29,7 +29,7 @@ const CollectionItemTable = (props: CollectionItemTableProps) => {
               </tr>
             </thead>
             <tbody>
-              {props.collectionTable.map((item, index) => {
+              {props.table.map((item, index) => {
                 return (
                   <tr key={index}>
                     <th>{index + 1}</th>

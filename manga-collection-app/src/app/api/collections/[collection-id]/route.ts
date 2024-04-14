@@ -115,6 +115,14 @@ export async function DELETE(req: NextRequest, { params }: { params: RequestPara
     console.log('Deleting collection item...')
     collection.data = collection.data.filter(collectionItem => collectionItem.id !== body.itemId)
 
+    await fetch(`${process.env.BASE_URL}/api/collections`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ collectionId: collectionId, numberOfItems: collection.data.length, lastUpdated: new Date().toISOString() })
+    })
+
     console.log('Writing to json...')
     fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
 

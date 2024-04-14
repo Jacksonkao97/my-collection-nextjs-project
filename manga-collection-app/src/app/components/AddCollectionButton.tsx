@@ -5,7 +5,6 @@ import React from 'react'
 import AddCollectionModel from './AddCollectionModel'
 
 const AddCollectionButton = () => {
-
   const handleOnCreate = () => {
     const dialog = document.getElementById('create_collection') as HTMLDialogElement
     dialog.showModal()

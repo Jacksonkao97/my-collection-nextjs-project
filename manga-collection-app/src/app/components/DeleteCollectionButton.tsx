@@ -7,16 +7,15 @@ import DeleteCollectionModel from './DeleteCollectionModel'
 
 // Assets
 import DeleteIcon from '../../../public/delete.png'
-import Collection from '../model/collectionModel'
 
 interface DeleteCollectionButtonProps {
-  collection: Collection
+  collectionId: string,
+  collectionName: string,
 }
 
 const DeleteCollectionButton = (props: DeleteCollectionButtonProps) => {
-
   const handleOnDelete = () => {
-    const dialog = document.getElementById('delete_collection_' + props.collection.id) as HTMLDialogElement
+    const dialog = document.getElementById('delete_collection_' + props.collectionId) as HTMLDialogElement
     dialog.showModal()
   }
 
@@ -28,8 +27,8 @@ const DeleteCollectionButton = (props: DeleteCollectionButtonProps) => {
         alt='Delete Collection'
         onClick={handleOnDelete}
       />
-      <dialog id={`delete_collection_${props.collection.id}`} className="modal" key={props.collection.id}>
-        <DeleteCollectionModel collection={props.collection} />
+      <dialog id={`delete_collection_${props.collectionId}`} className="modal" key={props.collectionId}>
+        <DeleteCollectionModel collectionId={props.collectionId} collectionName={props.collectionName} />
       </dialog>
     </>
   )

@@ -1,11 +1,9 @@
 'use client'
 import React from 'react'
 
-// Models
-import Collection from '../model/collectionModel'
-
 interface DeleteCollectionModelProps {
-  collection: Collection
+  collectionId: string,
+  collectionName: string,
 }
 
 const DeleteCollectionModel = (props: DeleteCollectionModelProps) => {
@@ -18,7 +16,7 @@ const DeleteCollectionModel = (props: DeleteCollectionModelProps) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(props.collection)
+        body: JSON.stringify({ id: props.collectionId })
       })
         .then(async (res) => {
           if (!res.ok) {
@@ -41,7 +39,7 @@ const DeleteCollectionModel = (props: DeleteCollectionModelProps) => {
     <>
       <div className='modal-box w-80 md:w-96 flex flex-col'>
         <form method="dialog" className='flex flex-col gap-10'>
-          <h1>Are you sure you want to delete this Collection {props.collection.name}?</h1>
+          <h1>Are you sure you want to delete this Collection {props.collectionName}?</h1>
           <div className='flex flex-row justify-evenly'>
             <button className='btn btn-sm' onClick={(e) => handleOnClick(e.currentTarget)}>Yes</button>
             <button className='btn btn-sm' onClick={(e) => handleOnClick(e.currentTarget)}>No</button>

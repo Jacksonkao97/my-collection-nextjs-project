@@ -71,6 +71,14 @@ export async function POST(req: NextRequest, { params }: { params: RequestParams
     console.log('Writing to json...')
     fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
 
+    await fetch(`${process.env.BASE_URL}/api/collections`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ collectionId: collectionId, numberOfItems: collection?.data.length, lastUpdated: new Date().toISOString() })
+    })
+
     console.log("Sending data...")
     return NextResponse.json({}, { status: 200 })
 
@@ -155,12 +163,21 @@ export async function PATCH(req: NextRequest, { params }: { params: RequestParam
       collection.data[index] = {
         ...collection.data[index],
         name: body.name || collection.data[index].name,
-        description: body.description || collection.data[index].description
+        description: body.description || collection.data[index].description,
+        lastUpdated: new Date().toISOString()
       }
     }
 
     console.log('Writing to json...')
     fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
+
+    await fetch(`${process.env.BASE_URL}/api/collections`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ collectionId: collectionId, lastUpdated: new Date().toISOString() })
+    })
 
     console.log("Sending data...")
     return NextResponse.json({}, { status: 200 })

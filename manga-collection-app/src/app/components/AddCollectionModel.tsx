@@ -4,6 +4,7 @@ import Image from 'next/image'
 
 interface CollectionInfo {
   image?: File | null,
+  imageType?: string | null,
   name: string,
 }
 
@@ -17,35 +18,70 @@ const AddCollectionModel = () => {
   const handleOnCreate = async (e: (HTMLButtonElement)) => {
     e.disabled = true
 
-    if (!collectionInfo) {
+    if (!collectionInfo.name) {
       alert('Please fill the collection name')
       e.disabled = false
       return
     }
 
-    await fetch(`${process.env.BASE_URL}/api/collections`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(collectionInfo)
+    try {
+      var image = null
+
+      if (collectionInfo.image) {
+        image = await base64Encode(collectionInfo.image)
+      }
+
+      const payload = {
+        image: image as string | null,
+        imageType: collectionInfo.imageType,
+        name: collectionInfo.name,
+      }
+
+      await fetch(`${process.env.BASE_URL}/api/collections`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+          }
+          alert('Collection created successfully')
+          cleanUp()
+          const dialog = document.getElementById('create_collection') as HTMLDialogElement
+          dialog.close()
+        })
+        .catch(err => {
+          throw new Error(err)
+        })
+        .finally(() => {
+          e.disabled = false
+        })
+    } catch (error) {
+      e.disabled = false
+      console.error(error)
+      alert('Error in creating collection')
+    }
+  }
+
+  /**
+   * This function will convert the image to base64
+   * @param file 
+   */
+  const base64Encode = async (file: File) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+
+    return new Promise((resolve, reject) => {
+      reader.onload = () => {
+        resolve(reader.result)
+      }
+      reader.onerror = (error) => {
+        reject(error)
+      }
     })
-      .then(async (res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
-        }
-        alert('Collection created successfully')
-        cleanUp()
-        const dialog = document.getElementById('create_collection') as HTMLDialogElement
-        dialog.close()
-      })
-      .catch(err => {
-        console.error(err.message)
-        alert('Error in creating collection')
-      })
-      .finally(() => {
-        e.disabled = false
-      })
   }
 
   /**
@@ -66,7 +102,8 @@ const AddCollectionModel = () => {
 
     setCollectionInfo({
       ...collectionInfo,
-      image: file
+      image: file,
+      imageType: file.type,
     })
   }
 
@@ -83,7 +120,7 @@ const AddCollectionModel = () => {
 
   return (
     <>
-      <div className='modal-box w-80 md:w-96 flex flex-col gap-6'>
+      <div className='modal-box w-80 md:w-96 flex flex-col gap-4'>
         <form method="dialog">
           {/* if there is a button in form, it will close the modal */}
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={cleanUp}>✕</button>
@@ -91,9 +128,13 @@ const AddCollectionModel = () => {
         <label>Image for the collection (Optional):</label>
         <input type="file" accept='image/*' onChange={(e) => handleImageChange(e.target)} className="file-input file-input-bordered w-full" />
         {collectionInfo.image && (
-          <div>
+          <div className='relative h-60'>
             <p>Selected image:</p>
-            <Image src={URL.createObjectURL(collectionInfo.image)} width={300} height={300} alt="Selected" style={{ maxWidth: '100%' }} />
+            <Image
+              fill={true}
+              style={{ objectFit: 'contain', width: '100%' }}
+              src={URL.createObjectURL(collectionInfo.image)}
+              alt="Selected" />
           </div>
         )}
         <label>The Collection name:</label>

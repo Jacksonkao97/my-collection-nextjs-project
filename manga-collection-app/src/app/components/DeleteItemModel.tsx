@@ -20,7 +20,7 @@ const DeleteItemModel = (props: DeleteItemModelProps) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ id: props.itemId })
+        body: JSON.stringify({ itemId: props.itemId })
       })
         .then(async (res) => {
           if (!res.ok) {

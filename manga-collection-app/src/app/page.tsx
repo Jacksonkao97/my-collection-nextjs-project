@@ -1,4 +1,6 @@
 import React from 'react'
+import { revalidatePath } from 'next/cache'
+revalidatePath('/', 'page') // revalidate the page every time it is visited
 
 // Models
 import Collection from '@/app/model/collectionModel.d'
@@ -28,7 +30,7 @@ export default async function Home() {
 
   return (
     <div className='flex flex-col gap-2 p-4'>
-      <div className='grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-12 place-items-center'>
+      <div className='grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:min-w-max gap-12 place-items-center'>
         {collections?.map((collection, index) => (
           Object.keys(collection).length !== 0 ?
             <CollectionCard collection={collection} key={index} /> : null

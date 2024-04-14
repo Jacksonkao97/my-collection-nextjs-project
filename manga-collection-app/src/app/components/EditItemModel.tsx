@@ -26,7 +26,7 @@ const EditItemModel = (props: EditItemModelProps) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ id: props.itemId, name: input.name, description: input.description })
+        body: JSON.stringify({ itemId: props.itemId, name: input.name, description: input.description })
       })
         .then(async (res) => {
           if (!res.ok) {
@@ -40,21 +40,27 @@ const EditItemModel = (props: EditItemModelProps) => {
         .finally(() => {
           e.disabled = false
         })
-      setInput({ name: '', description: '' })
+      handleOnClose()
       const dialog = document.getElementById(`edit_Item_${props.itemId}`) as HTMLDialogElement
       dialog.close()
     }
+  }
+
+  /**
+   * This function will clean the input fields
+   */
+  const handleOnClose = () => {
+    setInput({ name: '', description: '' })
   }
 
   return (
     <>
       <div className='modal-box w-80 md:w-96 flex flex-col gap-6'>
         <form method="dialog">
-          {/* if there is a button in form, it will close the modal */}
-          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setInput({ name: '', description: '' })}>✕</button>
+          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={handleOnClose}>✕</button>
         </form>
-        <label>Image for the item:</label>
-        <input type="file" className="file-input file-input-bordered w-full" />
+        {/* <label>Image for the item:</label>
+        <input type="file" className="file-input file-input-bordered w-full" /> */}
         <label>The Item name:</label>
         <input
           type="text"
@@ -74,7 +80,7 @@ const EditItemModel = (props: EditItemModelProps) => {
         <button className='btn btn-sm' onClick={(e) => handleOnConfirm(e.currentTarget)}>Confirm</button>
       </div>
       <form method="dialog" className="modal-backdrop">
-        <button onClick={() => setInput({ name: '', description: '' })}>close</button>
+        <button onClick={handleOnClose}>close</button>
       </form>
     </>
   )

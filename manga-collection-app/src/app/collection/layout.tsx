@@ -12,7 +12,8 @@ const CollectionLayout = ({ children }: Readonly<{ children: React.ReactNode }>)
           {
             pathname: '/',
           }
-        }>Back</Link>
+        }
+          replace>Back</Link>
         <AddItemButton />
       </div>
       {children}

@@ -16,7 +16,7 @@ const DeleteCollectionModel = (props: DeleteCollectionModelProps) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ id: props.collectionId })
+        body: JSON.stringify({ collectionId: props.collectionId })
       })
         .then(async (res) => {
           if (!res.ok) {

@@ -1,6 +1,5 @@
 import React from 'react'
 import { revalidatePath } from 'next/cache'
-revalidatePath('/', 'page') // revalidate the page every time it is visited
 
 // Models
 import Collection from '@/app/model/collectionModel.d'
@@ -14,6 +13,7 @@ interface FetchCollectionsResponse {
 }
 
 export default async function Home() {
+  revalidatePath('/', 'page') // revalidate the page every time it is visited
   // Get all collections
   const collections: Collection[] = await fetch(`${process.env.BASE_URL}/api/collections`, { cache: 'no-cache' })
     .then(async (res) => {

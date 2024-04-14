@@ -59,13 +59,15 @@ export async function POST(req: NextRequest, { params }: { params: RequestParams
     const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collection = data.results.find(collection => collection.id === collectionId)
+    var length = undefined
 
     if (!collection) {
       console.log('Collection not found, creating new collection...')
       data.results.push({ id: collectionId, data: [collectionItem] })
+      length = 1
     } else {
       console.log('Collection found, adding to collection...')
-      collection?.data.push(collectionItem)
+      collection.data.push(collectionItem)
     }
 
     console.log('Writing to json...')
@@ -76,7 +78,7 @@ export async function POST(req: NextRequest, { params }: { params: RequestParams
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ collectionId: collectionId, numberOfItems: collection?.data.length, lastUpdated: new Date().toISOString() })
+      body: JSON.stringify({ collectionId: collectionId, numberOfItems: collection?.data.length || length, lastUpdated: new Date().toISOString() })
     })
 
     console.log("Sending data...")

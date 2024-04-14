@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Models
 import Collection from "@/app/model/collectionModel";
+import CollectionItem from "@/app/model/collectionItemModel";
 
 interface JSONData {
   results: Collection[]
@@ -122,6 +123,13 @@ interface DeleteRequest {
   collectionId: string
 }
 
+interface JSONData2 {
+  results: {
+    id: string,
+    data: CollectionItem[]
+  }[]
+}
+
 /**
  * Delete a collection
  */
@@ -145,6 +153,17 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
 
     console.log('Writing to file...')
     fs.writeFileSync('src/app/fakeData/fakeCollections.json', JSON.stringify(data, null, 2))
+
+    const json2 = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
+    const data2: JSONData2 = JSON.parse(json2)
+    const index2 = data2.results.findIndex(collection => collection.id === body.collectionId)
+    if (index2 !== -1) {
+      console.log('Deleting collection items...')
+      data2.results.splice(index2, 1)
+
+      console.log('Writing to file...')
+      fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data2, null, 2))
+    }
 
     console.log('Sending response...')
     return NextResponse.json({}, { status: 200 })

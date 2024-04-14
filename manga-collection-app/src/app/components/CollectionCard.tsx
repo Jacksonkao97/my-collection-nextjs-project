@@ -16,16 +16,12 @@ interface CollectionCardProps {
 }
 
 const CollectionCard = (props: CollectionCardProps) => {
-  /**
-   * This function will decode the base64 image
-   */
-  const base64Decode = (base64: string) => {
-    try {
-      return `data:${props.collection.imageType};base64,${base64}`;
-    } catch (error) {
-      throw new Error('Error in decoding base64 image')
-    }
-  }
+  const newCreateDate = new Date(props.collection.creationDate)
+  const dateString = `${newCreateDate.getFullYear()}-${(newCreateDate.getMonth() + 1).toString().padStart(2, '0')}-${newCreateDate.getDate().toString().padStart(2, '0')}
+  \n ${newCreateDate.getHours().toString().padStart(2, '0')}:${newCreateDate.getMinutes().toString().padStart(2, '0')}:${newCreateDate.getSeconds().toString().padStart(2, '0')}`;
+  const newUpdateDate = new Date(props.collection.lastUpdated)
+  const updateDateString = `${newUpdateDate.getFullYear()}-${(newUpdateDate.getMonth() + 1).toString().padStart(2, '0')}-${newUpdateDate.getDate().toString().padStart(2, '0')}
+  \n ${newUpdateDate.getHours().toString().padStart(2, '0')}:${newUpdateDate.getMinutes().toString().padStart(2, '0')}:${newUpdateDate.getSeconds().toString().padStart(2, '0')}`;
 
   return (
     <div className="card w-collection_card h-collection_card glass group focus:ring-2 focus:ring-sky-500" tabIndex={0}>
@@ -37,8 +33,6 @@ const CollectionCard = (props: CollectionCardProps) => {
           fill
           priority
           style={{ objectFit: 'contain', width: '100%', height: '100%' }}
-          property='blur'
-          blurDataURL={`data:${props.collection.imageType};base64,${props.collection.image}`}
           src={NoImageIcon}
           alt='' />
       </figure>
@@ -46,8 +40,8 @@ const CollectionCard = (props: CollectionCardProps) => {
         <div className='flex flex-col gap-2'>
           <h2 className="card-title">{props.collection.name}</h2>
           <p>Number of Collections: {props.collection.numberOfItems}</p>
-          <p>Create Date: {props.collection.creationDate}</p>
-          <p>Last Updated: {props.collection.lastUpdated}</p>
+          <p>Create Date: {dateString}</p>
+          <p>Last Updated: {updateDateString}</p>
         </div>
         <div className="card-actions justify-end">
           <Link className="btn btn-primary" href={

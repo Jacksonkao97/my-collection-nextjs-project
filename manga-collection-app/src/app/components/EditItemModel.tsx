@@ -2,6 +2,9 @@
 import React, { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
+// Third-party
+import { toast } from 'sonner'
+
 interface EditItemModelProps {
   itemId: string,
 }
@@ -17,7 +20,7 @@ const EditItemModel = (props: EditItemModelProps) => {
     e.disabled = true
 
     if (!input.name && !input.description) {
-      alert('Fields cannot be empty')
+      toast.warning('Please enter the item name or description')
       e.disabled = false
       return
     } else {
@@ -30,12 +33,14 @@ const EditItemModel = (props: EditItemModelProps) => {
       })
         .then(async (res) => {
           if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+            console.error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+            toast.error('Server refused to add new item')
           }
+          toast.success('Item edit successfully')
         })
         .catch(err => {
           console.error(err.message)
-          alert('Error in adding new item')
+          toast.error('Connection error, please try again later')
         })
         .finally(() => {
           e.disabled = false

@@ -2,6 +2,9 @@
 import React from 'react'
 import { useSearchParams } from 'next/navigation'
 
+// Third-party
+import { toast } from 'sonner'
+
 interface DeleteItemModelProps {
   itemId: string,
 }
@@ -24,14 +27,16 @@ const DeleteItemModel = (props: DeleteItemModelProps) => {
       })
         .then(async (res) => {
           if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+            console.error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+            toast.error('Server refused to delete collection')
           }
+          toast.success('Collection deleted successfully')
           const dialog = document.getElementById(`delete_Item_${props.itemId}`) as HTMLDialogElement
           dialog.close()
         })
         .catch(err => {
           console.error(err.message)
-          alert('Failed to delete collection')
+          toast.error('Connection error, please try again later')
         })
         .finally(() => {
           e.disabled = false

@@ -2,6 +2,9 @@
 import React, { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
+// Third-party
+import { toast } from 'sonner'
+
 const AddItemModel = () => {
 
   const searchParams = useSearchParams()
@@ -14,7 +17,7 @@ const AddItemModel = () => {
     e.disabled = true
 
     if (!itemName) {
-      alert('Please enter the item name')
+      toast.warning('Please enter the item name')
       e.disabled = false
       return
     } else {
@@ -27,12 +30,13 @@ const AddItemModel = () => {
       })
         .then(async (res) => {
           if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+            console.error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+            toast.error('Server refused to add new item')
           }
         })
         .catch(err => {
           console.error(err.message)
-          alert('Error in adding new item')
+          toast.error('Connection error, please try again later')
         })
         .finally(() => {
           e.disabled = false

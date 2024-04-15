@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import NavBar from './components/NavBar';
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
       <body className="flex flex-col p-2 gap-2">
         <header><NavBar /></header>
         <main>{children}</main>
+        <Toaster richColors closeButton />
       </body>
     </html>
   );

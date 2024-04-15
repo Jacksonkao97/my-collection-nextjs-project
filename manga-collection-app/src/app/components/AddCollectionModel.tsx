@@ -2,6 +2,9 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 
+// third-party
+import { toast } from 'sonner'
+
 interface CollectionInfo {
   image?: File | null,
   imageType?: string | null,
@@ -9,7 +12,11 @@ interface CollectionInfo {
 }
 
 const AddCollectionModel = () => {
-  const [collectionInfo, setCollectionInfo] = useState({} as CollectionInfo)
+  const [collectionInfo, setCollectionInfo] = useState({
+    image: null,
+    imageType: null,
+    name: ''
+  } as CollectionInfo)
 
   /**
    * This function will send a POST request to the server to create a new collection
@@ -19,7 +26,7 @@ const AddCollectionModel = () => {
     e.disabled = true
 
     if (!collectionInfo.name) {
-      alert('Please fill the collection name')
+      toast.warning('Please enter the collection name')
       e.disabled = false
       return
     }
@@ -46,15 +53,17 @@ const AddCollectionModel = () => {
       })
         .then(async (res) => {
           if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+            console.error(`HTTP error! status: ${res.status}`)
+            toast.error('Server refused to create collection')
           }
-          alert('Collection created successfully')
+          toast.success('Collection created successfully')
           cleanUp()
           const dialog = document.getElementById('create_collection') as HTMLDialogElement
           dialog.close()
         })
         .catch(err => {
-          throw new Error(err)
+          console.error(err.message)
+          toast.error('Connection error in creating collection')
         })
         .finally(() => {
           e.disabled = false
@@ -62,7 +71,7 @@ const AddCollectionModel = () => {
     } catch (error) {
       e.disabled = false
       console.error(error)
-      alert('Error in creating collection')
+      toast.error('Failed to create collection')
     }
   }
 
@@ -96,7 +105,7 @@ const AddCollectionModel = () => {
     }
 
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
+      toast.warning('Please select an image file')
       return
     }
 

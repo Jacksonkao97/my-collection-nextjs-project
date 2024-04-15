@@ -1,6 +1,9 @@
 'use client'
 import React from 'react'
 
+// Third-party
+import { toast } from 'sonner'
+
 interface DeleteCollectionModelProps {
   collectionId: string,
   collectionName: string,
@@ -20,12 +23,14 @@ const DeleteCollectionModel = (props: DeleteCollectionModelProps) => {
       })
         .then(async (res) => {
           if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+            console.error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
+            toast.error('Server refused to delete collection')
           }
+          toast.success('Collection deleted successfully')
         })
         .catch(err => {
           console.error(err.message)
-          alert('Failed to delete collection')
+          toast.error('Connection error, please try again later')
         })
         .finally(() => {
           e.disabled = false

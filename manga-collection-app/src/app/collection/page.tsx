@@ -2,16 +2,13 @@ import React from 'react'
 
 // Models
 import CollectionItem from '@/app/model/collectionItemModel'
+import { FetchCollectionTableResponse } from '@/app/model/apiReqResModel'
 
 // Components
 import CollectionItemTable from '@/app/components/CollectionItemTable'
 
 interface SearchParams {
   id: string,
-}
-
-interface FetchCollectionTableResponse {
-  collectionTable: CollectionItem[],
 }
 
 const Collection = async ({ searchParams }: { searchParams: SearchParams }) => {

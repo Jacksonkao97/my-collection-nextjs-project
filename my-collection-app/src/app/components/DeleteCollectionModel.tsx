@@ -34,6 +34,8 @@ const DeleteCollectionModel = (props: DeleteCollectionModelProps) => {
         })
         .finally(() => {
           e.disabled = false
+          const dialog = document.getElementById('delete_collection_' + props.collectionId) as HTMLDialogElement
+          dialog.close()
         })
     } else {
       e.disabled = false
@@ -44,7 +46,7 @@ const DeleteCollectionModel = (props: DeleteCollectionModelProps) => {
     <>
       <div className='modal-box w-80 md:w-96 flex flex-col'>
         <form method="dialog" className='flex flex-col gap-10'>
-          <h1>Are you sure you want to delete this Collection {props.collectionName}?</h1>
+          <h1 className='text-ellipsis overflow-hidden'>Delete Collection: {props.collectionName}?</h1>
           <div className='flex flex-row justify-evenly'>
             <button className='btn btn-sm' onClick={(e) => handleOnClick(e.currentTarget)}>Yes</button>
             <button className='btn btn-sm' onClick={(e) => handleOnClick(e.currentTarget)}>No</button>

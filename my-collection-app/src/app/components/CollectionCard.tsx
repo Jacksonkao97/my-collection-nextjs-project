@@ -1,6 +1,10 @@
+'use client'
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+
+// Third-parties
+import { Reorder } from 'framer-motion'
 
 // Components
 import DeleteCollectionButton from './DeleteCollectionButton'
@@ -10,6 +14,7 @@ import Collection from '../model/collectionModel.d'
 
 // Assets
 import NoImageIcon from '../../../public/no-image-svgrepo-com.svg'
+import yourName from '../../../public/你的名字 .jpg'
 
 interface CollectionCardProps {
   collection: Collection
@@ -24,21 +29,17 @@ const CollectionCard = (props: CollectionCardProps) => {
   \n ${newUpdateDate.getHours().toString().padStart(2, '0')}:${newUpdateDate.getMinutes().toString().padStart(2, '0')}:${newUpdateDate.getSeconds().toString().padStart(2, '0')}`;
 
   return (
-    <div className="card w-collection_card h-collection_card glass group focus:ring-2 focus:ring-sky-500" tabIndex={0}>
-      <div className='absolute top-5 right-5 opacity-0 transition duration-300 ease-in-out group-hover:opacity-100 group-hover:z-10 group-focus:opacity-100'>
-        <DeleteCollectionButton collectionId={props.collection.id} collectionName={props.collection.name} />
-      </div>
-      <figure className='relative h-52'>
+    <div className="card w-auto h-[450px] bg-base-300 shadow-xl group focus:ring-2 focus:ring-sky-500 sm:customCardSM" tabIndex={0}>
+      <figure className='relative min-w-96 h-full'>
         <Image
           fill
-          priority
-          style={{ objectFit: 'contain', width: '100%', height: '100%' }}
-          src={NoImageIcon}
+          style={{ objectFit: 'cover' }}
+          src={yourName}
           alt='' />
       </figure>
-      <div className="card-body py-2 px-2 justify-between">
+      <div className="card-body w-full py-2 px-2 justify-between sm:w-32">
         <div className='flex flex-col gap-2'>
-          <h2 className="card-title">{props.collection.name}</h2>
+          <h2 className="text-2xl truncate">{props.collection.name}</h2>
           <p>Number of Collections: {props.collection.numberOfItems}</p>
           <p>Create Date: {dateString}</p>
           <p>Last Updated: {updateDateString}</p>
@@ -51,6 +52,9 @@ const CollectionCard = (props: CollectionCardProps) => {
             }
           } replace>Show Table</Link>
         </div>
+      </div>
+      <div className='absolute top-5 right-5 opacity-0 transition duration-300 ease-in-out group-hover:opacity-100 group-hover:z-10 group-focus:opacity-100'>
+        <DeleteCollectionButton collectionId={props.collection.id} collectionName={props.collection.name} />
       </div>
     </div>
   )

@@ -11,8 +11,8 @@ const AddCollectionButton = () => {
   }
 
   return (
-    <div className='flex flex-col justify-center content-center w-collection_card h-collection_card'>
-      <button className="btn btn-lg" onClick={handleOnCreate}>Add Collection</button>
+    <div className='flex flex-col justify-center items-center w-full h-full'>
+      <button className="btn btn-lg w-full sm:w-1/3" onClick={handleOnCreate}>Add Collection</button>
       <dialog id="create_collection" className="modal">
         <AddCollectionModel />
       </dialog>

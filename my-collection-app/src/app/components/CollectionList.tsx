@@ -1,30 +1,41 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 // Third-parties
 import { Reorder } from 'framer-motion'
+import { toast } from 'sonner'
 
 // Models
 import Collection from '../model/collectionModel'
 
 // Components
-import AddCollectionButton from './AddCollectionButton'
 import CollectionCard from './CollectionCard'
+
+// Actions
+import addCollection from '../actions/addCollection'
 
 interface CollectionListProps {
   collections: Collection[]
 }
 
 const CollectionList = (props: CollectionListProps) => {
+  // The collections that will be displayed
   const [collections, setCollections] = useState<Collection[]>(props.collections)
-  const [currentCollection, setCurrentCollection] = useState<Collection[]>(collections)
 
+  // The search value
   const [search, setSearch] = useState<string>('')
+
+  // Function to filter the collections
   const handleOnSearch = (e: HTMLInputElement) => {
     setSearch(e.value)
-    const filteredCollections = collections.filter(collection => collection.name.toLowerCase().includes(e.value.toLowerCase()))
-    setCurrentCollection(filteredCollections)
+    const filteredCollections = props.collections.filter(collection => collection.name.toLowerCase().includes(e.value.toLowerCase()))
+    setCollections(filteredCollections)
   }
+
+  useEffect(() => {
+    setCollections(props.collections)
+  }, [props.collections])
 
   return (
     <div className='flex flex-col w-full min-w-minWidth px-2 gap-2'>
@@ -36,12 +47,141 @@ const CollectionList = (props: CollectionListProps) => {
           onChange={(e) => handleOnSearch(e.currentTarget)} />
         <AddCollectionButton />
       </div>
-      <Reorder.Group className='flex flex-col w-full gap-4' values={currentCollection} onReorder={setCollections}>
-        {currentCollection?.map((collection, index) => (
+      <Reorder.Group className='flex flex-col w-full gap-4' values={collections} onReorder={setCollections}>
+        {collections?.map((collection, index) => (
           Object.keys(collection).length !== 0 ?
             <CollectionCard collection={collection} key={index} /> : null
         ))}
       </Reorder.Group>
+    </div>
+  )
+}
+
+const AddCollectionButton = () => {
+  const handleOnCreate = () => {
+    const dialog = document.getElementById('create_collection') as HTMLDialogElement
+    dialog.showModal()
+  }
+
+  return (
+    <div className='flex flex-col justify-center items-center w-full h-full'>
+      <button className="btn btn-lg w-full sm:w-1/3" onClick={handleOnCreate}>Add Collection</button>
+      <dialog id="create_collection" className="modal">
+        <AddCollectionModel />
+      </dialog>
+    </div>
+  )
+}
+
+const AddCollectionModel = () => {
+  const [collectionInfo, setCollectionInfo] = useState<{
+    image?: File | null,
+    imageType?: string | null,
+    name: string,
+  }>({
+    image: null,
+    imageType: null,
+    name: ''
+  })
+
+  const handleOnCreate = async (e: HTMLButtonElement) => {
+    if (!collectionInfo.name) {
+      toast.warning('Please provide a name for the collection')
+      return
+    }
+
+    e.disabled = true
+    await addCollection(collectionInfo)
+      .then((res) => {
+        if (res) {
+          toast.success('Collection created successfully')
+        } else {
+          toast.error('Failed to create collection')
+        }
+      })
+      .catch(err => {
+        toast.error('Failed to connect to the server')
+      })
+      .finally(() => {
+        e.disabled = false
+        cleanUp()
+        const dialog = document.getElementById('create_collection') as HTMLDialogElement
+        dialog.close()
+      })
+  }
+
+  /**
+   * Get the file and validate it as an image
+   * @param e 
+   */
+  const handleImageChange = (e: (EventTarget & HTMLInputElement)) => {
+    const file = e.files![0]
+
+    if (!file) {
+      setCollectionInfo({
+        ...collectionInfo,
+        image: null,
+        imageType: null,
+      })
+      return
+    }
+
+    if (!file.type.startsWith('image/')) {
+      toast.warning('Please select an image file')
+      setCollectionInfo({
+        ...collectionInfo,
+        image: null,
+        imageType: null,
+      })
+      return
+    }
+
+    setCollectionInfo({
+      ...collectionInfo,
+      image: file,
+      imageType: file.type,
+    })
+  }
+
+  /**
+   * Clean up the collection info
+   */
+  const cleanUp = () => {
+    setCollectionInfo({
+      image: null,
+      imageType: null,
+      name: ''
+    })
+    console.log('form cleaned up')
+  }
+
+  return (
+    <div className='modal-box w-96 h-96 flex flex-col'>
+      <form method='dialog' className='w-full h-full flex flex-col gap-4 justify-between'>
+        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={cleanUp}>✕</button>
+        <label>Image for the collection (Optional):</label>
+        <input type="file" name='image' accept='image/*' onChange={(e) => handleImageChange(e.target)} className="file-input file-input-bordered w-full" />
+        {collectionInfo.image && (
+          <div className='relative h-60'>
+            <p>Selected image:</p>
+            <Image
+              fill={true}
+              style={{ objectFit: 'contain', width: '100%' }}
+              src={URL.createObjectURL(collectionInfo.image)}
+              alt="Selected" />
+          </div>
+        )}
+        <label>The Collection name (Required):</label>
+        <input
+          name='name'
+          type="text"
+          placeholder="Collection Name"
+          className="input input-bordered w-full"
+          value={collectionInfo.name}
+          onChange={(e) => setCollectionInfo({ ...collectionInfo, name: e.target.value })}
+        />
+        <button className='btn btn-sm' onClick={async (e) => handleOnCreate(e.currentTarget)}>Create</button>
+      </form>
     </div>
   )
 }

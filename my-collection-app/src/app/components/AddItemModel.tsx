@@ -2,6 +2,9 @@
 import React, { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
+// Actions
+import addTableItem from '../actions/addTableItem'
+
 // Third-party
 import { toast } from 'sonner'
 
@@ -21,29 +24,23 @@ const AddItemModel = () => {
       e.disabled = false
       return
     } else {
-      await fetch(`${process.env.BASE_URL}/api/collections/${id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name: itemName })
-      })
-        .then(async (res) => {
-          if (!res.ok) {
-            console.error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
-            toast.error('Server refused to add new item')
+      await addTableItem({ collectionId: id!, name: itemName })
+        .then((res) => {
+          if (res) {
+            toast.success('Item added successfully')
+          } else {
+            toast.error('Server refused to add item')
           }
         })
         .catch(err => {
-          console.error(err.message)
           toast.error('Connection error, please try again later')
         })
         .finally(() => {
           e.disabled = false
+          setItemName('')
+          const dialog = document.getElementById('add_item') as HTMLDialogElement
+          dialog.close()
         })
-      setItemName('')
-      const dialog = document.getElementById('add_item') as HTMLDialogElement
-      dialog.close()
     }
   }
 

@@ -24,7 +24,7 @@ I am creating a personal project to learn more about Next.js, tailwindcss, and o
 - [x] Adding image to a collection
 - [x] View an item in a collection
 - [x] Add/Delete a item to the collection
-- [o] Use search bar to search for a collection
+- [x] Use search bar to search for a collection
 
 Below are features that I am planning to add in the future:
 

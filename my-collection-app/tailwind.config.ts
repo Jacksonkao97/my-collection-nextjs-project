@@ -15,6 +15,13 @@ const config: Config = {
       },
       width: {
         collection_card: "320px",
+        minWidth: "400px",
+      },
+      minWidth: {
+        minWidth: "400px",
+      },
+      screens: {
+        "sm": "650px",
       },
       height: {
         collection_card: "450px",

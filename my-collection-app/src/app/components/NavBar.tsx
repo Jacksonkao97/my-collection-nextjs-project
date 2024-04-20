@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 const NavBar = () => {
   return (
-    <nav className="navbar bg-neutral rounded-box drop-shadow-xl min-w-max">
+    <nav className="navbar bg-neutral rounded-box drop-shadow-xl w-full min-w-minWidth">
       <div className='navbar-start'></div>
       <div className="navbar-center">
         <Link className="btn btn-ghost text-xl" href='/'>My Collections</Link>

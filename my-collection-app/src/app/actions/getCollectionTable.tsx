@@ -1,18 +1,10 @@
-import React from 'react'
+'use server'
 
 // Models
-import CollectionItem from '@/app/model/collectionItemModel'
-import { FetchCollectionTableResponse } from '@/app/model/apiReqResModel'
+import CollectionItem from "../model/collectionItemModel"
+import { FetchCollectionTableResponse } from "../model/apiReqResModel"
 
-// Components
-import CollectionItemTable from '@/app/components/CollectionItemTable'
-
-interface SearchParams {
-  id: string,
-}
-
-const Collection = async ({ searchParams }: { searchParams: SearchParams }) => {
-  const collectionId = searchParams.id
+const getCollectionTable = async (collectionId: string) => {
   const table: CollectionItem[] = await fetch(`${process.env.BASE_URL}/api/collections/${collectionId}`, { cache: 'no-cache' })
     .then(async (res) => {
       if (!res.ok) {
@@ -26,9 +18,7 @@ const Collection = async ({ searchParams }: { searchParams: SearchParams }) => {
       throw new Error('Error fetching collection table')
     })
 
-  return (
-    <CollectionItemTable table={table} />
-  )
+  return table
 }
 
-export default Collection
+export default getCollectionTable

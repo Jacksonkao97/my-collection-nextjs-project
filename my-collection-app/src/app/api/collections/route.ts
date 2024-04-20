@@ -12,14 +12,22 @@ interface JSONData {
   results: Collection[]
 }
 
+const filePath = 'src/app/fakeData/fakeCollections.json'
+
 /**
  * Get all collections
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   console.log("GET /api/collections")
+
+  if (!fs.existsSync(filePath)) {
+    console.log("Creating a new json file...")
+    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
+  }
+
   try {
     console.log("Reading the json...")
-    const json = fs.readFileSync('src/app/fakeData/fakeCollections.json', 'utf-8')
+    const json = fs.readFileSync(filePath, 'utf-8')
     const data: JSONData = JSON.parse(json)
 
     console.log("Sending data...")
@@ -42,6 +50,12 @@ interface PostRequest {
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   console.log("POST /api/collections")
+
+  if (!fs.existsSync(filePath)) {
+    console.log("Creating a new json file...")
+    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
+  }
+
   try {
     const body: PostRequest = await req.json()
     console.log("Received data...")
@@ -57,14 +71,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     console.log('Reading the file...')
-    const json = fs.readFileSync('src/app/fakeData/fakeCollections.json', 'utf-8')
+    const json = fs.readFileSync(filePath, 'utf-8')
     const data: JSONData = JSON.parse(json)
 
     console.log('Adding new collection...')
     data.results.push(newCollection)
 
     console.log('Writing to file...')
-    fs.writeFileSync('src/app/fakeData/fakeCollections.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
 
     console.log('Sending response...')
     return NextResponse.json({}, { status: 201 })
@@ -86,12 +100,18 @@ interface PATCHRequest {
  */
 export async function PATCH(req: NextRequest): Promise<NextResponse> {
   console.log("PATCH /api/collections")
+
+  if (!fs.existsSync(filePath)) {
+    console.log("Creating a new json file...")
+    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
+  }
+
   try {
     const body: PATCHRequest = await req.json()
     console.log("Received data...")
 
     console.log('Reading the file...')
-    const json = fs.readFileSync('src/app/fakeData/fakeCollections.json', 'utf-8')
+    const json = fs.readFileSync(filePath, 'utf-8')
     const data: JSONData = JSON.parse(json)
     const index = data.results.findIndex(collection => collection.id === body.collectionId)
     if (index === -1) {
@@ -108,7 +128,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
     }
 
     console.log('Writing to file...')
-    fs.writeFileSync('src/app/fakeData/fakeCollections.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
 
     console.log('Sending response...')
     return NextResponse.json({}, { status: 200 })
@@ -135,12 +155,18 @@ interface JSONData2 {
  */
 export async function DELETE(req: NextRequest): Promise<NextResponse> {
   console.log("DELETE /api/collections")
+
+  if (!fs.existsSync(filePath)) {
+    console.log("Creating a new json file...")
+    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
+  }
+
   try {
     const body: DeleteRequest = await req.json()
     console.log("Received data...")
 
     console.log('Reading the file...')
-    const json = fs.readFileSync('src/app/fakeData/fakeCollections.json', 'utf-8')
+    const json = fs.readFileSync(filePath, 'utf-8')
     const data: JSONData = JSON.parse(json)
     const index = data.results.findIndex(collection => collection.id === body.collectionId)
     if (index === -1) {
@@ -152,17 +178,19 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     data.results.splice(index, 1)
 
     console.log('Writing to file...')
-    fs.writeFileSync('src/app/fakeData/fakeCollections.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
 
-    const json2 = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
-    const data2: JSONData2 = JSON.parse(json2)
-    const index2 = data2.results.findIndex(collection => collection.id === body.collectionId)
-    if (index2 !== -1) {
-      console.log('Deleting collection items...')
-      data2.results.splice(index2, 1)
+    if (fs.existsSync('src/app/fakeData/fakeCollectionItem.json')) {
+      const json2 = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
+      const data2: JSONData2 = JSON.parse(json2)
+      const index2 = data2.results.findIndex(collection => collection.id === body.collectionId)
+      if (index2 !== -1) {
+        console.log('Deleting collection items...')
+        data2.results.splice(index2, 1)
 
-      console.log('Writing to file...')
-      fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data2, null, 2))
+        console.log('Writing to file...')
+        fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data2, null, 2))
+      }
     }
 
     console.log('Sending response...')

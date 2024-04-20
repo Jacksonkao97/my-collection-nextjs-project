@@ -18,13 +18,21 @@ interface JSONData {
   }[]
 }
 
+const filePath = 'src/app/fakeData/fakeCollectionItem.json'
+
 export async function GET(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`GET /api/collections/[${params["collection-id"]}]`)
+
+  if (!fs.existsSync(filePath)) {
+    console.log("Creating a new json file...")
+    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
+  }
+
   try {
     const collectionId = params["collection-id"]
 
     console.log("Reading the file...")
-    const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
+    const json = fs.readFileSync(filePath, 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collectionItems: CollectionItem[] = data.results.find(collection => collection.id === collectionId)?.data || []
 
@@ -43,6 +51,12 @@ interface PostRequest {
 
 export async function POST(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`POST /api/collections/[${params["collection-id"]}]`)
+
+  if (!fs.existsSync(filePath)) {
+    console.log("Creating a new json file...")
+    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
+  }
+
   try {
     const collectionId = params["collection-id"]
     const body: PostRequest = await req.json()
@@ -56,7 +70,7 @@ export async function POST(req: NextRequest, { params }: { params: RequestParams
     }
 
     console.log('Reading the file...')
-    const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
+    const json = fs.readFileSync(filePath, 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collection = data.results.find(collection => collection.id === collectionId)
     var length = undefined
@@ -71,7 +85,7 @@ export async function POST(req: NextRequest, { params }: { params: RequestParams
     }
 
     console.log('Writing to json...')
-    fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
 
     await fetch(`${process.env.BASE_URL}/api/collections`, {
       method: 'PATCH',
@@ -99,13 +113,19 @@ interface DeleteRequest {
  */
 export async function DELETE(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`DELETE /api/collections/[${params["collection-id"]}]`)
+
+  if (!fs.existsSync(filePath)) {
+    console.log("Creating a new json file...")
+    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
+  }
+
   try {
     const collectionId = params["collection-id"]
     const body: DeleteRequest = await req.json()
     console.log("Received data...")
 
     console.log('Reading the file...')
-    const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
+    const json = fs.readFileSync(filePath, 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collection = data.results.find(collection => collection.id === collectionId)
 
@@ -126,7 +146,7 @@ export async function DELETE(req: NextRequest, { params }: { params: RequestPara
     })
 
     console.log('Writing to json...')
-    fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
 
     console.log("Sending data...")
     return NextResponse.json({}, { status: 200 })
@@ -148,13 +168,19 @@ interface PatchRequest {
  */
 export async function PATCH(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`PATCH /api/collections/[${params["collection-id"]}]`)
+
+  if (!fs.existsSync(filePath)) {
+    console.log("Creating a new json file...")
+    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
+  }
+
   try {
     const collectionId = params["collection-id"]
     const body: PatchRequest = await req.json()
     console.log("Received data...")
 
     console.log('Reading the file...')
-    const json = fs.readFileSync('src/app/fakeData/fakeCollectionItem.json', 'utf-8')
+    const json = fs.readFileSync(filePath, 'utf-8')
     const data: JSONData = JSON.parse(json)
     const collection = data.results.find(collection => collection.id === collectionId)
 
@@ -179,7 +205,7 @@ export async function PATCH(req: NextRequest, { params }: { params: RequestParam
     }
 
     console.log('Writing to json...')
-    fs.writeFileSync('src/app/fakeData/fakeCollectionItem.json', JSON.stringify(data, null, 2))
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
 
     await fetch(`${process.env.BASE_URL}/api/collections`, {
       method: 'PATCH',

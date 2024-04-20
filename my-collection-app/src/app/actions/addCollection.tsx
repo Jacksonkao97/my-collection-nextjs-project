@@ -1,22 +1,21 @@
 'use server'
 
 interface AddCollectionProps {
-  image?: File | null,
+  image?: string | ArrayBuffer | null,
   imageType?: string | null,
   name: string,
 }
 
 const addCollection = async (collectionInfo: AddCollectionProps) => {
+  console.log('addCollection', collectionInfo)
   if (collectionInfo.name === '') {
     return false
   }
 
-  const [image, imageType] = await base64Encode(collectionInfo.image as File | null)
-
   try {
     const payload = {
-      image: image as string | null,
-      imageType: imageType,
+      image: collectionInfo.image as string | null,
+      imageType: collectionInfo.imageType as string | null,
       name: collectionInfo.name,
     }
 
@@ -43,29 +42,6 @@ const addCollection = async (collectionInfo: AddCollectionProps) => {
     console.error(error)
     return false
   }
-}
-
-/**
-   * This function will convert the image to base64
-   * @param file 
-   */
-const base64Encode = async (file: File | null): Promise<[string | ArrayBuffer | null, string | null]> => {
-  if (!file) {
-    return [null, null]
-  }
-
-  const reader = new FileReader()
-  reader.readAsDataURL(file)
-
-  return new Promise((resolve, reject) => {
-    reader.onload = () => {
-      resolve([reader.result, file.type])
-    }
-    reader.onerror = (error) => {
-      console.error(error)
-      reject([null, null])
-    }
-  })
 }
 
 export default addCollection

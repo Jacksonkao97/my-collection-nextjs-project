@@ -19,15 +19,16 @@ I am creating a personal project to learn more about Next.js, tailwindcss, and o
 
 ## Features
 
-- [ ] View a list of collections
-- [ ] Create/Delete a collection
-- [ ] Adding image to a collection
-- [ ] View a collection of items
-- [ ] Add/Delete a item to the collection
-- [ ] Add a search bar to search for a collection
+- [x] View a list of collections
+- [x] Create/Delete a collection
+- [x] Adding image to a collection
+- [x] View an item in a collection
+- [x] Add/Delete a item to the collection
+- [o] Use search bar to search for a collection
 
 Below are features that I am planning to add in the future:
 
+- [ ] Setting page haven't been implemented yet
 - [ ] Edit a collection such as changing the name or image
 - [ ] Drag and drop to reorder the collection
 - some more features that I will add in the future

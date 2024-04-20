@@ -7,8 +7,8 @@ import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Manga Collection Netxjs Project",
-  description: "First Next.js app for my manga collection",
+  title: "My Collection Netxjs Project",
+  description: "First Next.js app for my collection",
 };
 
 export default function RootLayout({

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 // Models
@@ -52,7 +52,7 @@ const CollectionItemTable = (props: CollectionItemTableProps) => {
                     <th>{index + 1}</th>
                     <td className='truncate'>{item.name}</td>
                     <td>{item.lastUpdated}</td>
-                    <td className='truncate'>{item.description}</td>
+                    <td className='truncate'><textarea readOnly className='p-1 rounded-md w-full' rows={1} value={item.description}></textarea></td>
                     <td>
                       <EditItemButton itemId={item.id} />
                     </td>
@@ -90,6 +90,8 @@ const EditItemModel = ({ itemId }: { itemId: string }) => {
 
   const id = searchParams.get('id')
 
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
+
   const [input, setInput] = useState({ name: '', note: '' })
 
   const handleOnConfirm = async (e: HTMLButtonElement) => {
@@ -124,6 +126,11 @@ const EditItemModel = ({ itemId }: { itemId: string }) => {
     setInput({ name: '', note: '' })
   }
 
+  useEffect(() => {
+    textAreaRef.current!.style.height = 'auto'
+    textAreaRef.current!.style.height = textAreaRef.current!.scrollHeight + 'px'
+  }, [input.note])
+
   return (
     <>
       <div className='modal-box w-80 md:w-96 flex flex-col gap-6'>
@@ -141,13 +148,13 @@ const EditItemModel = ({ itemId }: { itemId: string }) => {
           onChange={e => setInput({ ...input, name: e.currentTarget.value })}
         />
         <label>The Item description:</label>
-        <input
-          type="text"
-          placeholder="Item Description"
-          className="input input-bordered w-full"
+        <textarea
+          ref={textAreaRef}
+          rows={1}
+          className='p-1 rounded-md'
+          placeholder='Write something...'
           value={input.note}
-          onChange={e => setInput({ ...input, note: e.currentTarget.value })}
-        />
+          onChange={e => setInput({ ...input, note: e.currentTarget.value })}></textarea>
         <button className='btn btn-sm' onClick={(e) => handleOnConfirm(e.currentTarget)}>Confirm</button>
       </div>
       <form method="dialog" className="modal-backdrop">

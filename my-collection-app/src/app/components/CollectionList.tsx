@@ -91,7 +91,14 @@ const AddCollectionModel = () => {
     }
 
     e.disabled = true
-    await addCollection(collectionInfo)
+
+    const payload = {
+      image: collectionInfo.image ? await base64Encode(collectionInfo.image).then((res) => res[0]) : null,
+      imageType: collectionInfo.imageType as string | null,
+      name: collectionInfo.name,
+    }
+
+    await addCollection(payload)
       .then((res) => {
         if (res) {
           toast.success('Collection created successfully')
@@ -108,6 +115,29 @@ const AddCollectionModel = () => {
         const dialog = document.getElementById('create_collection') as HTMLDialogElement
         dialog.close()
       })
+  }
+
+  /**
+   * This function will convert the image to base64
+   * @param file 
+   */
+  const base64Encode = async (file: File | null): Promise<[string | ArrayBuffer | null, string | null]> => {
+    if (!file) {
+      return [null, null]
+    }
+
+    const reader = new FileReader()
+    reader.readAsDataURL(file as File)
+
+    return new Promise((resolve, reject) => {
+      reader.onload = () => {
+        resolve([reader.result, file.type])
+      }
+      reader.onerror = (error) => {
+        console.error(error)
+        reject([null, null])
+      }
+    })
   }
 
   /**
@@ -147,6 +177,8 @@ const AddCollectionModel = () => {
    * Clean up the collection info
    */
   const cleanUp = () => {
+    const input = document.getElementById('imageInput') as HTMLInputElement
+    input.value = ''
     setCollectionInfo({
       image: null,
       imageType: null,
@@ -156,13 +188,13 @@ const AddCollectionModel = () => {
   }
 
   return (
-    <div className='modal-box w-96 h-96 flex flex-col'>
+    <div className='modal-box w-96 min-h-fit flex flex-col'>
       <form method='dialog' className='w-full h-full flex flex-col gap-4 justify-between'>
         <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={cleanUp}>✕</button>
         <label>Image for the collection (Optional):</label>
-        <input type="file" name='image' accept='image/*' onChange={(e) => handleImageChange(e.target)} className="file-input file-input-bordered w-full" />
+        <input id='imageInput' type="file" name='image' accept='image/*' onChange={(e) => handleImageChange(e.target)} className="file-input file-input-bordered w-full" />
         {collectionInfo.image && (
-          <div className='relative h-60'>
+          <div className='relative h-[250px] flex flex-col'>
             <p>Selected image:</p>
             <Image
               fill={true}

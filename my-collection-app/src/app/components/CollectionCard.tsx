@@ -15,7 +15,6 @@ import deleteCollection from '../actions/deleteCollection'
 
 // Assets
 import NoImageIcon from '../../../public/no-image-svgrepo-com.svg'
-import yourName from '../../../public/你的名字 .jpg'
 import DeleteIcon from '../../../public/delete.png'
 
 interface CollectionCardProps {
@@ -35,9 +34,10 @@ const CollectionCard = (props: CollectionCardProps) => {
       <figure className='relative min-w-96 h-full'>
         <Image
           fill
+          priority
           style={{ objectFit: 'cover' }}
-          src={yourName}
-          alt='' />
+          src={props.collection.image ? props.collection.image : NoImageIcon}
+          alt='collection Image' />
       </figure>
       <div className="card-body w-full py-2 px-2 justify-between sm:w-32">
         <div className='flex flex-col gap-2'>

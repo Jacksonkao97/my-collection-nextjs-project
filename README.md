@@ -26,13 +26,6 @@ I am creating a personal project to learn more about Next.js, tailwindcss, and o
 - [x] Add/Delete a item to the collection
 - [x] Use search bar to search for a collection
 
-Below are features that I am planning to add in the future:
-
-- [ ] Setting page haven't been implemented yet
-- [ ] Edit a collection such as changing the name or image
-- [ ] Drag and drop to reorder the collection
-- some more features that I will add in the future
-
 ## Getting Started
 
 To get started, you can clone this repository by running the following command:

@@ -18,7 +18,7 @@ interface JSONData {
   }[]
 }
 
-const filePath = 'src/app/fakeData/fakeCollectionItem.json'
+const filePath = 'src/app/data/CollectionItem.json'
 
 export async function GET(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`GET /api/collections/[${params["collection-id"]}]`)

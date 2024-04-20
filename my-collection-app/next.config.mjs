@@ -2,6 +2,8 @@
 const nextConfig = {
   env: {
     BASE_URL: process.env.BASE_URL,
+    DATAPATH: process.env.DATAPATH,
+    FAKEDATAPATH: process.env.FAKEDATAPATH,
   },
   images: {
     unoptimized: true,

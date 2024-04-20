@@ -42,7 +42,7 @@ const CollectionCard = (props: CollectionCardProps) => {
       <div className="card-body w-full py-2 px-2 justify-between sm:w-32">
         <div className='flex flex-col gap-2'>
           <h2 className="text-2xl truncate">{props.collection.name}</h2>
-          <p>Number of Collections: {props.collection.numberOfItems}</p>
+          <p>Number of Items: {props.collection.numberOfItems}</p>
           <p>Create Date: {dateString}</p>
           <p>Last Updated: {updateDateString}</p>
         </div>

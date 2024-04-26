@@ -39,6 +39,9 @@ const SuggestionSlide = () => {
             <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
           </svg>
         </a>
+        <div className='hidden absolute bottom-0 w-full h-fit group-hover:block bg-black/50 rounded-b-box'>
+          <h1 className='text-lg text-white p-2'><a href={suggestions[currentSlide]?.url} target='_blank'>{suggestions[currentSlide]?.title}</a></h1>
+        </div>
       </div>
     </div>
   )

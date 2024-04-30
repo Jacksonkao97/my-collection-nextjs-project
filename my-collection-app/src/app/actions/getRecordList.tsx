@@ -1,17 +1,16 @@
 'use server'
 
 // Models
-import CollectionItem from "../model/collectionItemModel"
-import { FetchCollectionTableResponse } from "../model/apiReqResModel"
+import { Record } from "@/app/models/dataType"
 
 const getCollectionTable = async (collectionId: string) => {
-  const table: CollectionItem[] = await fetch(`${process.env.BASE_URL}/api/collections/${collectionId}`, { cache: 'no-cache' })
+  const table: Record[] = await fetch(`${process.env.BASE_URL}/api/collections/${collectionId}`, { cache: 'no-cache' })
     .then(async (res) => {
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
       }
-      const data: FetchCollectionTableResponse = await res.json()
-      return data.collectionTable
+      const data: { records: Record[] } = await res.json()
+      return data.records
     })
     .catch(err => {
       console.error(err.message)

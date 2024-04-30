@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/app/db/db";
 
 // third parties imports
-import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-
-// Models
-import Collection from "@/app/model/collectionModel";
-import CollectionItem from "@/app/model/collectionItemModel";
-
-interface JSONData {
-  results: Collection[]
-}
-
-const filePath = 'src/app/data/Collections.json'
 
 /**
  * Get all collections
@@ -20,29 +10,40 @@ const filePath = 'src/app/data/Collections.json'
 export async function GET(req: NextRequest): Promise<NextResponse> {
   console.log("GET /api/collections")
 
-  if (!fs.existsSync(filePath)) {
-    console.log("Creating a new json file...")
-    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
-  }
-
   try {
-    console.log("Reading the json...")
-    const json = fs.readFileSync(filePath, 'utf-8')
-    const data: JSONData = JSON.parse(json)
+    console.log("Getting collections from database...")
+    const collections = await prisma.recordCollection.findMany({
+      take: 10,
+      orderBy: {
+        creationDate: 'desc'
+      }
+    })
+
+    console.log("Packaging data...")
+    const payload = collections.map(collection => ({
+      id: collection.id,
+      image: collection.image,
+      imageType: collection.imageType,
+      title: collection.title,
+      numberOfRecords: collection.numOfRecords,
+      creationDate: new Intl.DateTimeFormat('en-US').format(collection.creationDate),
+      note: collection.notes,
+    }))
 
     console.log("Sending data...")
-    return NextResponse.json({ collections: data.results }, { status: 200 })
+    return NextResponse.json({ collections: payload }, { status: 200 })
 
   } catch (error) {
-    console.error("Error in getting collections from json", error)
+    console.error("Error in get collections---->", error)
     return NextResponse.json({ error: "Internal Error" }, { status: 500 })
   }
 }
 
-interface PostRequest {
+interface POSTRequestBody {
+  title: string,
   image?: string | null,
   imageType?: string | null,
-  name: string
+  note?: string | null,
 }
 
 /**
@@ -51,48 +52,38 @@ interface PostRequest {
 export async function POST(req: NextRequest): Promise<NextResponse> {
   console.log("POST /api/collections")
 
-  if (!fs.existsSync(filePath)) {
-    console.log("Creating a new json file...")
-    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
-  }
-
   try {
-    const body: PostRequest = await req.json()
     console.log("Received data...")
+    const body: POSTRequestBody = await req.json()
 
-    const newCollection: Collection = {
-      id: uuidv4(),
-      image: body.image || null,
-      imageType: body.imageType || null,
-      name: body.name,
-      numberOfItems: 0,
-      creationDate: new Date().toISOString(),
-      lastUpdated: new Date().toISOString(),
-    }
-
-    console.log('Reading the file...')
-    const json = fs.readFileSync(filePath, 'utf-8')
-    const data: JSONData = JSON.parse(json)
-
-    console.log('Adding new collection...')
-    data.results.push(newCollection)
-
-    console.log('Writing to file...')
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
+    console.log("Creating new collection...")
+    const newCollection = await prisma.recordCollection.create({
+      data: {
+        id: uuidv4(),
+        image: body.image || null,
+        imageType: body.imageType || null,
+        title: body.title,
+        numOfRecords: 0,
+        creationDate: new Date().toISOString(),
+        notes: body.note || null,
+      }
+    })
 
     console.log('Sending response...')
     return NextResponse.json({}, { status: 201 })
 
   } catch (error) {
-    console.error("Error in creating new collection and store to json", error)
+    console.error("Error in create collection---->", error)
     return NextResponse.json({ error: "Internal Error" }, { status: 500 })
   }
 }
 
-interface PATCHRequest {
+interface PATCHRequestBody {
   collectionId: string,
-  name?: string,
-  numberOfItems?: number,
+  title?: string,
+  image?: string | null,
+  imageType?: string | null,
+  note?: string | null,
 }
 
 /**
@@ -101,53 +92,45 @@ interface PATCHRequest {
 export async function PATCH(req: NextRequest): Promise<NextResponse> {
   console.log("PATCH /api/collections")
 
-  if (!fs.existsSync(filePath)) {
-    console.log("Creating a new json file...")
-    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
-  }
-
   try {
-    const body: PATCHRequest = await req.json()
     console.log("Received data...")
+    const body: PATCHRequestBody = await req.json()
 
-    console.log('Reading the file...')
-    const json = fs.readFileSync(filePath, 'utf-8')
-    const data: JSONData = JSON.parse(json)
-    const index = data.results.findIndex(collection => collection.id === body.collectionId)
-    if (index === -1) {
+    const collection = await prisma.recordCollection.findUnique({
+      where: {
+        id: body.collectionId
+      }
+    })
+
+    if (!collection) {
       console.log('Collection not found')
       return NextResponse.json({ error: "Collection not found" }, { status: 404 })
+    } else {
+      console.log("Updating collection...")
+      await prisma.recordCollection.update({
+        where: {
+          id: body.collectionId
+        },
+        data: {
+          title: body.title || collection.title,
+          image: body.image || collection.image,
+          imageType: body.imageType || collection.imageType,
+          notes: body.note || collection.notes,
+        }
+      })
+
+      console.log('Sending response...')
+      return NextResponse.json({}, { status: 200 })
     }
-
-    console.log('Updating collection...')
-    data.results[index] = {
-      ...data.results[index],
-      name: body.name || data.results[index].name,
-      numberOfItems: body.numberOfItems || data.results[index].numberOfItems,
-      lastUpdated: new Date().toISOString()
-    }
-
-    console.log('Writing to file...')
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
-
-    console.log('Sending response...')
-    return NextResponse.json({}, { status: 200 })
 
   } catch (error) {
-    console.error("Error in updating collection and store to json", error)
+    console.error("Error in update colletions---->", error)
     return NextResponse.json({ error: "Internal Error" }, { status: 500 })
   }
 }
 
-interface DeleteRequest {
+interface DELETERequestBody {
   collectionId: string
-}
-
-interface JSONData2 {
-  results: {
-    id: string,
-    data: CollectionItem[]
-  }[]
 }
 
 /**
@@ -156,48 +139,33 @@ interface JSONData2 {
 export async function DELETE(req: NextRequest): Promise<NextResponse> {
   console.log("DELETE /api/collections")
 
-  if (!fs.existsSync(filePath)) {
-    console.log("Creating a new json file...")
-    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
-  }
-
   try {
-    const body: DeleteRequest = await req.json()
     console.log("Received data...")
+    const body: DELETERequestBody = await req.json()
 
-    console.log('Reading the file...')
-    const json = fs.readFileSync(filePath, 'utf-8')
-    const data: JSONData = JSON.parse(json)
-    const index = data.results.findIndex(collection => collection.id === body.collectionId)
-    if (index === -1) {
+    const collection = await prisma.recordCollection.findUnique({
+      where: {
+        id: body.collectionId
+      }
+    })
+
+    if (!collection) {
       console.log('Collection not found')
       return NextResponse.json({ error: "Collection not found" }, { status: 404 })
+    } else {
+      console.log("Deleting collection...")
+      await prisma.recordCollection.delete({
+        where: {
+          id: body.collectionId
+        }
+      })
+
+      console.log('Sending response...')
+      return NextResponse.json({}, { status: 200 })
     }
-
-    console.log('Deleting collection...')
-    data.results.splice(index, 1)
-
-    console.log('Writing to file...')
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
-
-    if (fs.existsSync('src/app/data/CollectionItem.json')) {
-      const json2 = fs.readFileSync('src/app/data/CollectionItem.json', 'utf-8')
-      const data2: JSONData2 = JSON.parse(json2)
-      const index2 = data2.results.findIndex(collection => collection.id === body.collectionId)
-      if (index2 !== -1) {
-        console.log('Deleting collection items...')
-        data2.results.splice(index2, 1)
-
-        console.log('Writing to file...')
-        fs.writeFileSync('src/app/data/CollectionItem.json', JSON.stringify(data2, null, 2))
-      }
-    }
-
-    console.log('Sending response...')
-    return NextResponse.json({}, { status: 200 })
 
   } catch (error) {
-    console.error("Error in deleting collection and store to json", error)
+    console.error("Error in delete collections---->", error)
     return NextResponse.json({ error: "Internal Error" }, { status: 500 })
   }
 }

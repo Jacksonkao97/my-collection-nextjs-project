@@ -1,14 +1,14 @@
-import React from 'react'
+import Link from 'next/link'
 
 // Models
-import CollectionItem from '@/app/model/collectionItemModel'
-import { FetchCollectionTableResponse } from '@/app/model/apiReqResModel'
+import { Record } from '@/app/models/dataType'
 
 // Components
-import CollectionItemTable from '@/app/components/CollectionItemTable'
+import CollectionRecordTable from '@/app/components/CollectionRecordTable'
+import CreateRecordBtn from '@/app/components/CreateRecordBtn'
 
 // Actions
-import getCollectionTable from '../actions/getCollectionTable'
+import getRecordList from '@/app/actions/getRecordList'
 
 interface SearchParams {
   id: string,
@@ -16,10 +16,22 @@ interface SearchParams {
 
 const Collection = async ({ searchParams }: { searchParams: SearchParams }) => {
   const collectionId = searchParams.id
-  const table: CollectionItem[] = await getCollectionTable(collectionId)
+  const table: Record[] = await getRecordList(collectionId)
 
   return (
-    <CollectionItemTable table={table} />
+    <div className='flex flex-col gap-3 justify-center w-full min-w-[400px] sm:px-[50px] md:px-[100px]'>
+      <Link
+        className='btn btn-sm w-20'
+        href={
+          {
+            pathname: '/',
+          }
+        }>Back</Link>
+      <CollectionRecordTable table={table} />
+      <div className="fixed right-[25px] bottom-[25px]">
+        <CreateRecordBtn />
+      </div>
+    </div>
   )
 }
 

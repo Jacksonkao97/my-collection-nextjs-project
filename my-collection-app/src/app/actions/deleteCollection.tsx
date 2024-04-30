@@ -1,4 +1,5 @@
 'use server'
+import { revalidatePath } from "next/cache"
 
 const deleteCollection = async (collectionId: string) => {
   const response = await fetch(`${process.env.BASE_URL}/api/collections`, {
@@ -13,6 +14,7 @@ const deleteCollection = async (collectionId: string) => {
         console.error(`HTTP error! status: ${res.status} and message: ${res.statusText}`)
         return false
       }
+      revalidatePath('/')
       return true
     })
     .catch(err => {

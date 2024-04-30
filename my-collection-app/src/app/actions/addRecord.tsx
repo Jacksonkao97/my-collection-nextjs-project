@@ -1,20 +1,28 @@
 'use server'
 import { revalidatePath } from "next/cache"
 
-interface EditTableItemProps {
+interface recordProps {
   collectionId: string,
-  itemId: string,
-  name: string,
-  note: string,
+  title: string,
+  type: string,
+  episode?: Number,
+  season?: Number,
+  note?: string,
 }
 
-const editTableItem = async (props: EditTableItemProps) => {
+const addRecord = async (props: recordProps) => {
   const response = await fetch(`${process.env.BASE_URL}/api/collections/${props.collectionId}`, {
-    method: 'PATCH',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ itemId: props.itemId, name: props.name, description: props.note })
+    body: JSON.stringify({
+      title: props.title,
+      type: props.type,
+      episode: props.episode,
+      season: props.season,
+      note: props.note
+    })
   })
     .then(async (res) => {
       if (!res.ok) {
@@ -31,4 +39,4 @@ const editTableItem = async (props: EditTableItemProps) => {
   return response
 }
 
-export default editTableItem
+export default addRecord

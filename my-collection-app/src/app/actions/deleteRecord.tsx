@@ -1,14 +1,13 @@
 'use server'
-
 import { revalidatePath } from "next/cache"
 
-const deleteTableItem = async ({ collectionId, itemId }: { collectionId: string, itemId: string }) => {
+const deleteRecord = async ({ collectionId, recordId }: { collectionId: string, recordId: string }) => {
   const response = await fetch(`${process.env.BASE_URL}/api/collections/${collectionId}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ itemId: itemId })
+    body: JSON.stringify({ recordId: recordId })
   })
     .then(async (res) => {
       if (!res.ok) {
@@ -25,4 +24,4 @@ const deleteTableItem = async ({ collectionId, itemId }: { collectionId: string,
   return response
 }
 
-export default deleteTableItem
+export default deleteRecord

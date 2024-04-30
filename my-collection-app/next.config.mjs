@@ -13,6 +13,9 @@ const nextConfig = {
     bodyParser: {
       sizeLimit: '10mb',
     },
+    serverActions: {
+      bodySizeLimit: '10mb' // Set desired value here
+    },
   },
 };
 

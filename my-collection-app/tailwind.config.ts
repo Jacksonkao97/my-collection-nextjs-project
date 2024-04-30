@@ -20,9 +20,6 @@ const config: Config = {
       minWidth: {
         minWidth: "400px",
       },
-      screens: {
-        "sm": "650px",
-      },
       height: {
         collection_card: "450px",
         news_table: "600px",
@@ -33,16 +30,23 @@ const config: Config = {
   daisyui: {
     themes: [
       {
-        light: {
-          ...require("daisyui/src/theming/themes")["light"],
-          primary: "#524632",
-          secondary: "#8f7e4f",
-          accent: "#d8ffdd",
-          neutral: "#c3c49e",
-          "base-100": "#dedbd8"
-        }
+        'beaver': {
+          'base-100': '#f6f4f0',
+          'base-200': '#e8e3d9',
+          'base-300': '#d2c9b6',
+          'neutral': '#b8a78c',
+          'info': '#a38c6c',
+          'success': '#947b5e',
+          'primary': '#886c55',
+          'warning': '#664f42',
+          'secondary': '#58433b',
+          'error': '#4d3c36',
+          'accent': '#2b201d',
+        },
       },
-      "dark"],
+      "garden",
+      "dark"
+    ],
     darkTheme: "dark", // name of one of the included themes for dark mode
     base: true, // applies background color and foreground color for root element by default
     styled: true, // include daisyUI colors and design decisions for all components

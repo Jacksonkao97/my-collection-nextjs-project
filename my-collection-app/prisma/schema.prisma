@@ -10,17 +10,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model News {
-  id    String   @id @default(uuid())
-  date  DateTime
-  title String
-  url   String
+model Item {
+  id        String       @id @default(uuid())
+  title     String
+  type      String
+  episode   Float?       @default(0)
+  season    Int?         @default(0)
+  country   String?
+  image     String?
+  imageType String?
+  author    String?
+  url       String?
+  date      DateTime?
+  records   ItemRecord[]
 }
 
-model Suggestions {
-  id    String   @id @default(uuid())
-  image String
-  title String
-  url   String
-  date  DateTime
+model ItemRecord {
+  id           String           @id @default(uuid())
+  collectionId String
+  itemId       String
+  creationDate DateTime         @default(now())
+  lastUpdate   DateTime         @updatedAt
+  notes        String?
+  item         Item             @relation(fields: [itemId], references: [id])
+  collection   RecordCollection @relation(fields: [collectionId], references: [id])
+}
+
+model RecordCollection {
+  id           String       @id @default(uuid())
+  title        String
+  numOfRecords Int          @default(0)
+  creationDate DateTime     @default(now())
+  image        String?
+  imageType    String?
+  notes        String?
+  records      ItemRecord[]
 }

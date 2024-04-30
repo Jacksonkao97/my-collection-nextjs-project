@@ -1,48 +1,8 @@
 # My-Collection-NextJs-Personal-Project
 
-This project is a personal project that I am working on to learn Next.js and to create a personal project that can record anime, manga and drama into a collection and keep track on them. This project is still in progress and I will update the README file as I add more features to the project.
-
-## Table of Contents
-- [Introduction](#introduction)
-- [Technologies](#technologies)
-- [Features](#features)
-- [Getting Started](#getting-started)
-
-## Introduction
-
-I am creating a personal project to learn more about Next.js, tailwindcss, and other very cool libraries such as framer-motion, sonnar and daisyUI. This project is a personal collection website where I can add the record of my favorite things such as manga chapter, anime episode, drama note, and books description.
+This project is a hands-on learning experience focused on mastering Next.js, a React framework renowned for its powerful features in building modern web applications. The primary goals include gaining proficiency in the new app router introduced in version 14, leveraging Tailwind CSS for styling the application, and utilizing Prisma ORM to effectively manage the database.
 
 ## Technologies
 
-| [Next.js](https://nextjs.org/) | [sonner](https://github.com/emilkowalski/sonner) | [framer-motion](https://www.framer.com/motion/) | [tailwindcss](https://tailwindcss.com/) | [daisyUI](https://daisyui.com/) |
+| [Next.js](https://nextjs.org/) | [sonner](https://github.com/emilkowalski/sonner) | [tailwindcss](https://tailwindcss.com/) | [daisyUI](https://daisyui.com/) | [Prisma](https://www.prisma.io/) |
 |---------|--------|---------------|-------------|---------|
-
-## Features
-
-- [x] View a list of collections
-- [x] Create/Delete a collection
-- [x] Adding image to a collection
-- [x] View an item in a collection
-- [x] Add/Delete a item to the collection
-- [x] Use search bar to search for a collection
-
-## Getting Started
-
-To get started, you can clone this repository by running the following command:
-
-```bash
-git clone https://github.com/Jacksonkao97/my-collection-nextjs-project.git
-```
-
-Then, you can go to the `my-collection-app` folder and install the dependencies by running the following command:
-
-```bash
-cd my-collection-app
-npm install
-```
-
-Finally, you can run the development server by running the following command:
-
-```bash
-npm run dev
-```

@@ -38,11 +38,14 @@ const DeleteCollectionModel = (props: { collectionId: string, collectionName: st
         .then((res) => {
           if (!res) {
             toast.error('Server refused to delete collection')
+            return
           }
           toast.success('Collection deleted successfully')
+          return
         })
         .catch(err => {
           toast.error('Connection error, please try again later')
+          return
         })
         .finally(() => {
           e.disabled = false

@@ -1,225 +1,206 @@
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/app/db/db";
 
 // third parties imports
-import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-
-// local imports
-import CollectionItem from "@/app/model/collectionItemModel";
 
 interface RequestParams {
   "collection-id": string
 }
 
-interface JSONData {
-  results: {
-    id: string,
-    data: CollectionItem[]
-  }[]
-}
-
-const filePath = 'src/app/data/CollectionItem.json'
-
+/**
+ * Get all records in a collection
+ */
 export async function GET(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`GET /api/collections/[${params["collection-id"]}]`)
 
-  if (!fs.existsSync(filePath)) {
-    console.log("Creating a new json file...")
-    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
-  }
-
   try {
+    console.log("Getting collection id...")
     const collectionId = params["collection-id"]
 
-    console.log("Reading the file...")
-    const json = fs.readFileSync(filePath, 'utf-8')
-    const data: JSONData = JSON.parse(json)
-    const collectionItems: CollectionItem[] = data.results.find(collection => collection.id === collectionId)?.data || []
+    console.log("Getting collection items from database...")
+    const records = await prisma.itemRecord.findMany({
+      where: {
+        collectionId: collectionId
+      },
+      orderBy: {
+        creationDate: 'desc'
+      }
+    })
+
+    console.log("Packaging data...")
+    const payload = await Promise.all(records.map(async record => ({
+      id: record.id,
+      title: await prisma.item.findUnique({ where: { id: record.itemId } }).then(item => item?.title),
+      episode: await prisma.item.findUnique({ where: { id: record.itemId } }).then(item => item?.episode),
+      season: await prisma.item.findUnique({ where: { id: record.itemId } }).then(item => item?.season),
+      note: record.notes,
+      creationDate: new Intl.DateTimeFormat('en-US').format(record.creationDate),
+      lastUpdated: new Intl.DateTimeFormat('en-US').format(record.lastUpdate),
+    })))
 
     console.log("Sending data...")
-    return NextResponse.json({ collectionTable: collectionItems }, { status: 200 })
+    return NextResponse.json({ records: payload }, { status: 200 })
 
   } catch (error) {
-    console.error("Error in getting collection items from json", error)
+    console.error("Error in get records---->", error)
     return NextResponse.json({ error: "Internal Error" }, { status: 500 })
   }
 }
 
-interface PostRequest {
-  name: string,
+interface POSTRequestBody {
+  title: string,
+  type: string,
+  episode?: number,
+  season?: number,
+  note?: string,
 }
 
+/**
+ * Create a new record in a collection
+ */
 export async function POST(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`POST /api/collections/[${params["collection-id"]}]`)
 
-  if (!fs.existsSync(filePath)) {
-    console.log("Creating a new json file...")
-    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
-  }
-
   try {
+    console.log("Getting collection id...")
     const collectionId = params["collection-id"]
-    const body: PostRequest = await req.json()
+
     console.log("Received data...")
+    const body: POSTRequestBody = await req.json()
 
-    const collectionItem: CollectionItem = {
-      id: uuidv4(),
-      name: body.name,
-      creationDate: new Date().toISOString(),
-      lastUpdated: new Date().toISOString(),
-    }
+    console.log("Creating new item...")
+    const item = await prisma.item.create({
+      data: {
+        id: uuidv4(),
+        title: body.title,
+        type: body.type,
+        episode: body.episode || null,
+        season: body.season || null,
+      }
+    })
 
-    console.log('Reading the file...')
-    const json = fs.readFileSync(filePath, 'utf-8')
-    const data: JSONData = JSON.parse(json)
-    const collection = data.results.find(collection => collection.id === collectionId)
-    var length = undefined
+    console.log("Creating new record...")
+    const newRecord = await prisma.itemRecord.create({
+      data: {
+        id: uuidv4(),
+        itemId: item.id,
+        collectionId: collectionId,
+        notes: body.note || null,
+        creationDate: new Date().toISOString(),
+        lastUpdate: new Date().toISOString(),
+      }
+    })
 
-    if (!collection) {
-      console.log('Collection not found, creating new collection...')
-      data.results.push({ id: collectionId, data: [collectionItem] })
-      length = 1
-    } else {
-      console.log('Collection found, adding to collection...')
-      collection.data.push(collectionItem)
-    }
-
-    console.log('Writing to json...')
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
-
-    await fetch(`${process.env.BASE_URL}/api/collections`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ collectionId: collectionId, numberOfItems: collection?.data.length || length, lastUpdated: new Date().toISOString() })
+    console.log("Updating collection...")
+    await prisma.recordCollection.update({
+      where: { id: collectionId },
+      data: {
+        numOfRecords: {
+          increment: 1
+        }
+      }
     })
 
     console.log("Sending data...")
     return NextResponse.json({}, { status: 200 })
 
   } catch (error) {
-    console.error("Error in adding collection item to json", error)
+    console.error("Error in create item---->", error)
     return NextResponse.json({ error: "Internal Error" }, { status: 500 })
   }
 }
 
-interface DeleteRequest {
-  itemId: string
+interface DELETERequestBody {
+  recordId: string
 }
 
 /**
- * This function will delete the collection item
+ * Delete the record in a collection
  */
 export async function DELETE(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`DELETE /api/collections/[${params["collection-id"]}]`)
 
-  if (!fs.existsSync(filePath)) {
-    console.log("Creating a new json file...")
-    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
-  }
-
   try {
+    console.log("Getting collection id...")
     const collectionId = params["collection-id"]
-    const body: DeleteRequest = await req.json()
+
     console.log("Received data...")
+    const body: DELETERequestBody = await req.json()
 
-    console.log('Reading the file...')
-    const json = fs.readFileSync(filePath, 'utf-8')
-    const data: JSONData = JSON.parse(json)
-    const collection = data.results.find(collection => collection.id === collectionId)
-
-    if (!collection) {
-      console.log('Collection not found')
-      return NextResponse.json({ error: "Collection not found" }, { status: 404 })
-    }
-
-    console.log('Deleting collection item...')
-    collection.data = collection.data.filter(collectionItem => collectionItem.id !== body.itemId)
-
-    await fetch(`${process.env.BASE_URL}/api/collections`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ collectionId: collectionId, numberOfItems: collection.data.length, lastUpdated: new Date().toISOString() })
+    console.log("Deleting record...")
+    await prisma.itemRecord.delete({
+      where: {
+        id: body.recordId
+      }
     })
 
-    console.log('Writing to json...')
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
+    console.log("Updating collection...")
+    await prisma.recordCollection.update({
+      where: { id: collectionId },
+      data: {
+        numOfRecords: {
+          decrement: 1
+        }
+      }
+    })
 
     console.log("Sending data...")
     return NextResponse.json({}, { status: 200 })
 
   } catch (error) {
-    console.error("Error in deleting collection item from json", error)
+    console.error("Error in delete record---->", error)
     return NextResponse.json({ error: "Internal Error" }, { status: 500 })
   }
 }
 
-interface PatchRequest {
-  itemId: string,
-  name?: string,
-  description?: string
+interface PATCHRequestBody {
+  recordId: string,
+  episode?: number,
+  season?: number,
+  note?: string,
 }
 
 /**
- * This function will update the collection item
+ * Update the record in a collection
  */
 export async function PATCH(req: NextRequest, { params }: { params: RequestParams }): Promise<NextResponse> {
   console.log(`PATCH /api/collections/[${params["collection-id"]}]`)
 
-  if (!fs.existsSync(filePath)) {
-    console.log("Creating a new json file...")
-    fs.writeFileSync(filePath, JSON.stringify({ results: [] }, null, 2))
-  }
-
   try {
+    console.log("Getting collection id...")
     const collectionId = params["collection-id"]
-    const body: PatchRequest = await req.json()
+
     console.log("Received data...")
+    const body: PATCHRequestBody = await req.json()
 
-    console.log('Reading the file...')
-    const json = fs.readFileSync(filePath, 'utf-8')
-    const data: JSONData = JSON.parse(json)
-    const collection = data.results.find(collection => collection.id === collectionId)
-
-    if (!collection) {
-      console.log('Collection not found')
-      return NextResponse.json({ error: "Collection not found" }, { status: 404 })
-    }
-
-    const index = collection.data.findIndex(item => item.id === body.itemId)
-
-    if (index === -1) {
-      console.log('Collection item not found')
-      return NextResponse.json({ error: "Collection item not found" }, { status: 404 })
-    } else {
-      console.log('Updating collection item...')
-      collection.data[index] = {
-        ...collection.data[index],
-        name: body.name || collection.data[index].name,
-        description: body.description || collection.data[index].description,
-        lastUpdated: new Date().toISOString()
-      }
-    }
-
-    console.log('Writing to json...')
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
-
-    await fetch(`${process.env.BASE_URL}/api/collections`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
+    console.log("Updating item...")
+    await prisma.item.update({
+      where: {
+        id: await prisma.itemRecord.findUnique({ where: { id: body.recordId } }).then(record => record?.itemId)
       },
-      body: JSON.stringify({ collectionId: collectionId, lastUpdated: new Date().toISOString() })
+      data: {
+        episode: body.episode || null,
+        season: body.season || null,
+      }
+    })
+
+    console.log("Updating record...")
+    await prisma.itemRecord.update({
+      where: {
+        id: body.recordId
+      },
+      data: {
+        notes: body.note || null,
+        lastUpdate: new Date().toISOString()
+      }
     })
 
     console.log("Sending data...")
     return NextResponse.json({}, { status: 200 })
 
   } catch (error) {
-    console.error("Error in updating collection item to json", error)
+    console.error("Error in update record---->", error)
     return NextResponse.json({ error: "Internal Error" }, { status: 500 })
   }
 }

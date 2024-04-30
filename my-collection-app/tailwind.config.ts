@@ -20,9 +20,6 @@ const config: Config = {
       minWidth: {
         minWidth: "400px",
       },
-      screens: {
-        "sm": "650px",
-      },
       height: {
         collection_card: "450px",
         news_table: "600px",

@@ -1,5 +1,5 @@
 {
-  "name": "manga-collection-app",
+  "name": "my-collection-app",
   "version": "0.1.0",
   "private": true,
   "prisma": {

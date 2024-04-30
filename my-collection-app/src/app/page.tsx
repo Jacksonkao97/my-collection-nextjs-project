@@ -1,19 +1,18 @@
-import React from 'react'
-
-// Models
-import Collection from '@/app/model/collectionModel.d'
-
 // Components
-import CollectionList from './components/CollectionList'
+import CollectionList from '@/app/components/CollectionList'
+import CreateCollectionBtn from '@/app/components/CreateCollectionBtn';
 
-// actions
-import getCollectionList from './actions/getCollectionList'
+// Actions
+import getCollectionList from '@/app/actions/getCollectionList';
 
 export default async function Home() {
-  const collections: Collection[] = await getCollectionList()
+  const collections = await getCollectionList()
   return (
-    <div className='flex flex-col gap-2 w-full min-w-minWidth'>
+    <div className='flex justify-center w-full min-w-[400px] sm:px-[50px] md:px-[100px]'>
       <CollectionList collections={collections} />
+      <div className="fixed right-[25px] bottom-[25px]">
+        <CreateCollectionBtn />
+      </div>
     </div>
   );
 }

@@ -1,12 +1,16 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // Third-party
 import { toast } from 'sonner'
 
+// Models
+import { Item } from '@/app/models/dataType'
+
 // Actions
 import addRecord from '@/app/actions/addRecord'
+import getItemList from '@/app/actions/getItemList'
 
 const CreateRecordBtn = () => {
   const handleOnAddRecord = () => {
@@ -31,7 +35,90 @@ export default CreateRecordBtn
 const AddItemModel = () => {
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
-  const [recordInfo, setRecordInfo] = useState({ title: '', type: '', episode: 0, season: 0, note: '' })
+  const [itemTitle, setItemTitle] = useState('')
+  const [itemList, setItemList] = useState<Item[]>([])
+  const [recordInfo, setRecordInfo] = useState<{ title: string, type: string, episode: number, season: number, note?: string, itemId?: string }>(
+    { title: '', type: '', episode: 0, season: 0, note: '', itemId: '' }
+  )
+
+  const cleanUp = () => {
+    setRecordInfo({ title: '', type: '', episode: 0, season: 0, note: '', itemId: '' })
+    setItemTitle('')
+  }
+
+  useEffect(() => {
+    setItemTitle(recordInfo.title)
+  }, [recordInfo.title])
+
+  useEffect(() => {
+    getItemList(5, itemTitle)
+      .then((res) => {
+        setItemList(res)
+      })
+      .catch(err => {
+        toast.error('Connection error! cannot retrieve Item list, please try again later')
+      })
+  }, [itemTitle])
+
+  return (
+    <>
+      <div className='modal-box w-[400px] flex flex-col gap-4 sm:w-[640px] sm:max-w-none sm:flex-row'>
+        <div className='w-1/2 flex flex-col gap-1'>
+          <SelectForm list={itemList} onChange={(item: Item) => setRecordInfo({
+            ...recordInfo,
+            title: item.title,
+            type: item.type,
+            episode: item.episode,
+            season: item.season,
+            itemId: item.id
+          })} />
+        </div>
+        <div className='w-1/2 flex flex-col gap-1'>
+          <RecordForm id={id!} recordInfo={recordInfo} onchange={(itemTitle: string) => setItemTitle(itemTitle)} />
+        </div>
+        <form method="dialog">
+          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={cleanUp}>✕</button>
+        </form>
+      </div>
+      <form method="dialog" className="modal-backdrop">
+        <button onClick={cleanUp}>close</button>
+      </form>
+    </>
+  )
+}
+
+interface SelectFormProps {
+  list: Item[],
+  onChange: (item: Item) => void
+}
+
+const SelectForm = (props: SelectFormProps) => {
+  const [itemList, setItemList] = useState<Item[]>(props.list)
+
+  useEffect(() => {
+    setItemList(props.list)
+  }, [props.list])
+
+  return (
+    <div className='flex flex-col w-full h-full bg-white/50 rounded-box p-2 gap-2'>
+      <h1>Similar Items:</h1>
+      {itemList.length > 0 ? itemList.map(item => (
+        <div key={item.id} className='hover:bg-gray-50/20'>
+          <button className='btn btn-sm' onClick={() => props.onChange(item)}>{item.title}</button>
+        </div>
+      )) : 'No item found'}
+    </div>
+  )
+}
+
+interface RecordFormProps {
+  id: string,
+  recordInfo: { title: string, type: string, episode: number, season: number, note?: string, itemId?: string },
+  onchange: (itemTitle: string) => void
+}
+
+const RecordForm = (props: RecordFormProps) => {
+  const [recordInfo, setRecordInfo] = useState(props.recordInfo)
 
   const handleOnAdd = async (e: HTMLButtonElement) => {
     e.disabled = true
@@ -41,7 +128,7 @@ const AddItemModel = () => {
       e.disabled = false
       return
     } else {
-      await addRecord({ collectionId: id!, title: recordInfo.title, type: recordInfo.type, episode: recordInfo.episode, season: recordInfo.season, note: recordInfo.note })
+      await addRecord({ collectionId: props.id!, title: recordInfo.title, type: recordInfo.type, episode: recordInfo.episode, season: recordInfo.season, note: recordInfo.note, itemId: recordInfo.itemId })
         .then((res) => {
           if (res) {
             toast.success('Item added successfully')
@@ -62,70 +149,68 @@ const AddItemModel = () => {
   }
 
   const cleanUp = () => {
-    setRecordInfo({ title: '', type: '', episode: 0, season: 0, note: '' })
+    setRecordInfo({ title: '', type: '', episode: 0, season: 0, note: '', itemId: '' })
   }
+
+  useEffect(() => {
+    setRecordInfo(props.recordInfo)
+  }, [props.recordInfo])
 
   return (
     <>
-      <div className='modal-box w-[400px] flex flex-col gap-4 sm:w-[640px] sm:max-w-none sm:flex-row'>
-        <form method="dialog">
-          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={cleanUp}>✕</button>
-        </form>
-        <div className='w-1/2'></div>
-        <div className='w-1/2 flex flex-col gap-1'>
-          <label>The Record info:</label>
-          <input
-            type="text"
-            placeholder="Record Title"
-            className="input input-bordered focus:outline-0 input-sm w-full max-w-xs"
-            value={recordInfo.title}
-            onChange={e => setRecordInfo({ ...recordInfo, title: e.currentTarget.value })}
-          />
-          <select className="select select-bordered focus:outline-0 select-sm w-full max-w-xs" onChange={e => setRecordInfo({ ...recordInfo, type: e.currentTarget.value })} value={recordInfo.type}>
-            <option>Book</option>
-            <option>Drama</option>
-            <option>Movie</option>
-            <option>Others</option>
-          </select>
-          <input
-            type="number"
-            placeholder="Episode (Optional)"
-            className="input input-bordered focus:outline-0 input-sm w-full max-w-xs"
-            min={0}
-            onKeyDown={(event) => {
-              const key = event.key;
-              if (key === '-' || key === '+' || key === 'e' || key === 'E') {
-                event.preventDefault();
-              }
-            }}
-            onChange={e => setRecordInfo({ ...recordInfo, episode: parseFloat(e.currentTarget.value) })}
-          />
-          <input
-            type="number"
-            placeholder="Season (Optional)"
-            className="input input-bordered focus:outline-0 input-sm w-full max-w-xs"
-            min={0}
-            onKeyDown={(event) => {
-              const key = event.key;
-              if (key === '-' || key === '+' || key === 'e' || key === 'E') {
-                event.preventDefault();
-              }
-            }}
-            onChange={e => setRecordInfo({ ...recordInfo, season: parseInt(e.currentTarget.value) })}
-          />
-          <input
-            type="text"
-            placeholder="Note (Optional)"
-            className="input input-bordered focus:outline-0 input-sm w-full max-w-xs"
-            value={recordInfo.note}
-            onChange={e => setRecordInfo({ ...recordInfo, note: e.currentTarget.value })}
-          />
-          <button className='btn btn-sm' onClick={(e) => handleOnAdd(e.currentTarget)}>Add Record</button>
-        </div>
-      </div>
-      <form method="dialog" className="modal-backdrop">
-        <button onClick={cleanUp}>close</button>
-      </form>
+      <label>The Record info:</label>
+      <input
+        type="text"
+        placeholder="Record Title"
+        className="input input-bordered focus:outline-0 input-sm w-full max-w-xs"
+        value={recordInfo.title}
+        onChange={e => {
+          setRecordInfo({ ...recordInfo, title: e.currentTarget.value, itemId: ''})
+          props.onchange(e.currentTarget.value)
+        }}
+      />
+      <select className="select select-bordered focus:outline-0 select-sm w-full max-w-xs" onChange={e => setRecordInfo({ ...recordInfo, type: e.currentTarget.value })} value={recordInfo.type}>
+        <option>Book</option>
+        <option>Drama</option>
+        <option>Movie</option>
+        <option>Others</option>
+      </select>
+      <input
+        type="number"
+        placeholder="Episode (Optional)"
+        className="input input-bordered focus:outline-0 input-sm w-full max-w-xs"
+        min={0}
+        onKeyDown={(event) => {
+          const key = event.key;
+          if (key === '-' || key === '+' || key === 'e' || key === 'E') {
+            event.preventDefault();
+          }
+        }}
+        defaultValue={recordInfo.episode}
+        onChange={e => setRecordInfo({ ...recordInfo, episode: parseFloat(e.currentTarget.value) })}
+      />
+      <input
+        type="number"
+        placeholder="Season (Optional)"
+        className="input input-bordered focus:outline-0 input-sm w-full max-w-xs"
+        min={0}
+        onKeyDown={(event) => {
+          const key = event.key;
+          if (key === '-' || key === '+' || key === 'e' || key === 'E') {
+            event.preventDefault();
+          }
+        }}
+        defaultValue={recordInfo.season}
+        onChange={e => setRecordInfo({ ...recordInfo, season: parseInt(e.currentTarget.value) })}
+      />
+      <input
+        type="text"
+        placeholder="Note (Optional)"
+        className="input input-bordered focus:outline-0 input-sm w-full max-w-xs"
+        value={recordInfo.note}
+        onChange={e => setRecordInfo({ ...recordInfo, note: e.currentTarget.value })}
+      />
+      <button className='btn btn-sm' onClick={(e) => handleOnAdd(e.currentTarget)}>Add Record</button>
     </>
   )
 }

@@ -54,6 +54,7 @@ interface POSTRequestBody {
   episode?: number,
   season?: number,
   note?: string,
+  itemId?: string
 }
 
 /**
@@ -69,28 +70,61 @@ export async function POST(req: NextRequest, { params }: { params: RequestParams
     console.log("Received data...")
     const body: POSTRequestBody = await req.json()
 
-    console.log("Creating new item...")
-    const item = await prisma.item.create({
-      data: {
-        id: uuidv4(),
-        title: body.title,
-        type: body.type,
-        episode: body.episode || null,
-        season: body.season || null,
+    const itemExists = await prisma.item.findFirst({
+      where: {
+        id: body.itemId
       }
     })
 
-    console.log("Creating new record...")
-    const newRecord = await prisma.itemRecord.create({
-      data: {
-        id: uuidv4(),
-        itemId: item.id,
-        collectionId: collectionId,
-        notes: body.note || null,
-        creationDate: new Date().toISOString(),
-        lastUpdate: new Date().toISOString(),
-      }
-    })
+    if (itemExists) {
+      console.log("Updating existing item...")
+      await prisma.item.update({
+        where: {
+          id: itemExists.id
+        },
+        data: {
+          type: body.type,
+          episode: body.episode || null,
+          season: body.season || null,
+        }
+      })
+
+      console.log("Creating new record from existing item...")
+      const newRecord = await prisma.itemRecord.create({
+        data: {
+          id: uuidv4(),
+          itemId: itemExists.id,
+          collectionId: collectionId,
+          notes: body.note || null,
+          creationDate: new Date().toISOString(),
+          lastUpdate: new Date().toISOString(),
+        }
+      })
+
+    } else {
+      console.log("Creating new item...")
+      const item = await prisma.item.create({
+        data: {
+          id: uuidv4(),
+          title: body.title,
+          type: body.type,
+          episode: body.episode || null,
+          season: body.season || null,
+        }
+      })
+
+      console.log("Creating new record...")
+      const newRecord = await prisma.itemRecord.create({
+        data: {
+          id: uuidv4(),
+          itemId: item.id,
+          collectionId: collectionId,
+          notes: body.note || null,
+          creationDate: new Date().toISOString(),
+          lastUpdate: new Date().toISOString(),
+        }
+      })
+    }
 
     console.log("Updating collection...")
     await prisma.recordCollection.update({

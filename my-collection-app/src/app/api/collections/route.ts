@@ -153,12 +153,6 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
       console.log('Collection not found')
       return NextResponse.json({ error: "Collection not found" }, { status: 404 })
     } else {
-      console.log("Deleting records...")
-      await prisma.itemRecord.deleteMany({
-        where: {
-          collectionId: body.collectionId
-        }
-      })
       console.log("Deleting collection...")
       await prisma.recordCollection.delete({
         where: {

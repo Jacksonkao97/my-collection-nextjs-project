@@ -12,6 +12,7 @@ import { Item } from '@/app/models/dataType'
 import addRecord from '@/app/actions/addRecord'
 import getItemList from '@/app/actions/getItemList'
 
+// MARK: - CreateRecordBtn
 const CreateRecordBtn = () => {
   const handleOnAddRecord = () => {
     const dialog = document.getElementById('add_record') as HTMLDialogElement
@@ -24,7 +25,7 @@ const CreateRecordBtn = () => {
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
       </svg>
       <dialog id="add_record" className="modal">
-        <AddItemModel />
+        <AddRecordModel />
       </dialog>
     </div>
   )
@@ -32,13 +33,14 @@ const CreateRecordBtn = () => {
 
 export default CreateRecordBtn
 
-const AddItemModel = () => {
+// MARK: - AddRecordModel
+const AddRecordModel = () => {
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
   const [itemTitle, setItemTitle] = useState('')
   const [itemList, setItemList] = useState<Item[]>([])
   const [recordInfo, setRecordInfo] = useState<{ title: string, type: string, episode: number, season: number, note?: string, itemId?: string }>(
-    { title: '', type: '', episode: 0, season: 0, note: '', itemId: '' }
+    { title: '', type: 'Book', episode: 0, season: 0, note: '', itemId: '' }
   )
 
   const cleanUp = () => {
@@ -51,7 +53,7 @@ const AddItemModel = () => {
   }, [recordInfo.title])
 
   useEffect(() => {
-    getItemList(5, itemTitle)
+    getItemList({ limit: 5, offset: 0, contains: itemTitle })
       .then((res) => {
         setItemList(res)
       })
@@ -63,7 +65,7 @@ const AddItemModel = () => {
   return (
     <>
       <div className='modal-box w-[400px] flex flex-col gap-4 sm:w-[640px] sm:max-w-none sm:flex-row'>
-        <div className='w-1/2 flex flex-col gap-1'>
+        <div className='w-full sm:w-1/2 flex flex-col gap-1'>
           <SelectForm list={itemList} onChange={(item: Item) => setRecordInfo({
             ...recordInfo,
             title: item.title,
@@ -73,7 +75,7 @@ const AddItemModel = () => {
             itemId: item.id
           })} />
         </div>
-        <div className='w-1/2 flex flex-col gap-1'>
+        <div className='w-full sm:w-1/2 flex flex-col gap-1'>
           <RecordForm id={id!} recordInfo={recordInfo} onchange={(itemTitle: string) => setItemTitle(itemTitle)} />
         </div>
         <form method="dialog">
@@ -92,6 +94,7 @@ interface SelectFormProps {
   onChange: (item: Item) => void
 }
 
+// MARK: - SelectForm
 const SelectForm = (props: SelectFormProps) => {
   const [itemList, setItemList] = useState<Item[]>(props.list)
 
@@ -100,10 +103,10 @@ const SelectForm = (props: SelectFormProps) => {
   }, [props.list])
 
   return (
-    <div className='flex flex-col w-full h-full bg-white/50 rounded-box p-2 gap-2'>
-      <h1>Similar Items:</h1>
+    <div className='flex flex-col w-full h-full rounded-box p-2 gap-2 bg-neutral'>
+      <h1 className='text-2xl'>Similar Items:</h1>
       {itemList.length > 0 ? itemList.map(item => (
-        <div key={item.id} className='hover:bg-gray-50/20'>
+        <div key={item.id}>
           <button className='btn btn-sm' onClick={() => props.onChange(item)}>{item.title}</button>
         </div>
       )) : 'No item found'}
@@ -117,6 +120,7 @@ interface RecordFormProps {
   onchange: (itemTitle: string) => void
 }
 
+// MARK: - RecordForm
 const RecordForm = (props: RecordFormProps) => {
   const [recordInfo, setRecordInfo] = useState(props.recordInfo)
 
@@ -149,7 +153,8 @@ const RecordForm = (props: RecordFormProps) => {
   }
 
   const cleanUp = () => {
-    setRecordInfo({ title: '', type: '', episode: 0, season: 0, note: '', itemId: '' })
+    setRecordInfo({ title: '', type: 'Book', episode: 0, season: 0, note: '', itemId: '' })
+    props.onchange('')
   }
 
   useEffect(() => {
@@ -165,7 +170,7 @@ const RecordForm = (props: RecordFormProps) => {
         className="input input-bordered focus:outline-0 input-sm w-full max-w-xs"
         value={recordInfo.title}
         onChange={e => {
-          setRecordInfo({ ...recordInfo, title: e.currentTarget.value, itemId: ''})
+          setRecordInfo({ ...recordInfo, title: e.currentTarget.value, itemId: '' })
           props.onchange(e.currentTarget.value)
         }}
       />
@@ -186,7 +191,7 @@ const RecordForm = (props: RecordFormProps) => {
             event.preventDefault();
           }
         }}
-        defaultValue={recordInfo.episode}
+        value={recordInfo.episode}
         onChange={e => setRecordInfo({ ...recordInfo, episode: parseFloat(e.currentTarget.value) })}
       />
       <input
@@ -200,7 +205,7 @@ const RecordForm = (props: RecordFormProps) => {
             event.preventDefault();
           }
         }}
-        defaultValue={recordInfo.season}
+        value={recordInfo.season}
         onChange={e => setRecordInfo({ ...recordInfo, season: parseInt(e.currentTarget.value) })}
       />
       <input

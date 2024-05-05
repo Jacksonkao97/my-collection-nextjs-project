@@ -8,7 +8,7 @@ import DeleteCollectionBtn from '@/app/components/DeleteCollectionBtn'
 import { Collection } from '@/app/models/dataType'
 
 // Assets
-import NoImageIcon from '../../../public/no-image-svgrepo-com.svg'
+import NoImageIcon from '@/app/assets/noImage.svg'
 
 interface CollectionCardProps {
   collection: Collection

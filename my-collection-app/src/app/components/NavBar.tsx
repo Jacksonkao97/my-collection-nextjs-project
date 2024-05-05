@@ -1,8 +1,6 @@
 import Link from 'next/link'
 import HomeSVG from '@/app/assets/homeSVG'
-import BookSVG from '@/app/assets/bookSVG'
-import MovieSVG from '@/app/assets/movieSVG'
-import DramaSVG from '@/app/assets/dramaSVG'
+import ItemSVG from '@/app/assets/tableSVG'
 import SettingSVG from '@/app/assets/settingSVG'
 
 const NavBar = () => {
@@ -20,24 +18,9 @@ const NavBar = () => {
             <HomeSVG />
           </div>
         </Link>
-        <Link className='btn btn-ghost btn-circle' href='/book'>
+        <Link className='btn btn-ghost btn-circle' href='/item'>
           <div className="indicator">
-            <BookSVG />
-          </div>
-        </Link>
-        <Link className='btn btn-ghost btn-circle' href='/movie'>
-          <div className="indicator">
-            <MovieSVG />
-          </div>
-        </Link>
-        <Link className='btn btn-ghost btn-circle' href='/drama'>
-          <div className="indicator">
-            <DramaSVG />
-          </div>
-        </Link>
-        <Link className="btn btn-ghost btn-circle" href='/setting'>
-          <div className="indicator">
-            <SettingSVG />
+            <ItemSVG />
           </div>
         </Link>
         <label className="cursor-pointer grid place-items-center">

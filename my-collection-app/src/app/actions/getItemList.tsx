@@ -3,8 +3,15 @@
 // Models
 import { Item } from "@/app/models/dataType"
 
-const getItemList = async (limit: number, offset: string) => {
-  const items = await fetch(`${process.env.BASE_URL}/api/items?limit=${limit}&offset=${offset}`, { cache: "no-store" })
+interface Props {
+  limit: number
+  offset: number
+  contains?: string
+  type?: string
+}
+
+const getItemList = async (props: Props) => {
+  const items = await fetch(`${process.env.BASE_URL}/api/items?limit=${props.limit}&offset=${props.offset}&contains=${props.contains}&type=${props.type}`, { cache: "no-store" })
     .then(async (res) => {
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`)

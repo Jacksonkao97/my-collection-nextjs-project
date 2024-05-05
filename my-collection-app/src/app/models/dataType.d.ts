@@ -24,4 +24,6 @@ export interface Item {
   type: string,
   episode: number,
   season: number,
+  image?: string,
+  imageType?: string,
 }

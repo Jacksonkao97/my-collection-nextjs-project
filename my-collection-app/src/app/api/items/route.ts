@@ -40,8 +40,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   }
 }
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
-}
+// export async function POST(req: NextRequest): Promise<NextResponse> {
+// }
 
 interface PATCHItemRequest {
   itemId: string,

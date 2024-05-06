@@ -6,3 +6,9 @@ This project is a hands-on learning experience focused on mastering Next.js, a R
 
 | [Next.js](https://nextjs.org/) | [sonner](https://github.com/emilkowalski/sonner) | [tailwindcss](https://tailwindcss.com/) | [daisyUI](https://daisyui.com/) | [Prisma](https://www.prisma.io/) |
 |---------|--------|---------------|-------------|---------|
+
+## How to run the project
+
+1. Clone the repository
+2. Install the dependencies by running `npm install`
+3. Run the development server by running `npm run dev`

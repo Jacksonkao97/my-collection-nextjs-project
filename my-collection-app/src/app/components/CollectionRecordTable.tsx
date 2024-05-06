@@ -19,6 +19,7 @@ interface CollectionItemTableProps {
 const CollectionRecordTable = (props: CollectionItemTableProps) => {
   const [table, setTable] = useState<Record[]>(props.table)
   const [search, setSearch] = useState<string>('')
+  const [selectedRecord, setSelectedRecord] = useState<Record | null>(null)
 
   const handleOnSearch = (e: HTMLInputElement) => {
     setSearch(e.value)
@@ -26,8 +27,9 @@ const CollectionRecordTable = (props: CollectionItemTableProps) => {
     setTable(filteredTable)
   }
 
-  const handleOnEdit = (recordId: String) => {
-    const dialog = document.getElementById(`edit_Record_${recordId}`) as HTMLDialogElement
+  const handleOnEdit = (record: Record) => {
+    setSelectedRecord(record)
+    const dialog = document.getElementById(`edit_Record`) as HTMLDialogElement
     dialog.showModal()
   }
 
@@ -59,21 +61,21 @@ const CollectionRecordTable = (props: CollectionItemTableProps) => {
             <tbody>
               {table.map((item, index) => {
                 return (
-                  <tr key={index} className='cursor-pointer hover:bg-black/20' onClick={() => handleOnEdit(item.id)}>
+                  <tr key={index} className='cursor-pointer hover:bg-black/20' onClick={() => handleOnEdit(item)}>
                     <td className='hidden sm:table-cell'>{index + 1}</td>
                     <td className='truncate max-w-[100px]'>{item.title}</td>
                     <td className='hidden lg:table-cell'>{item.lastUpdated}</td>
                     <td className='truncate max-w-[60px]'>{item.episode || 0}</td>
                     <td className='truncate max-w-[60px]'>{item.season || 0}</td>
                     <td className='truncate'>{item.note || 'No data . . .'}</td>
-                    <dialog id={`edit_Record_${item.id}`} className="modal">
-                      <EditRecordModel record={item} />
-                    </dialog>
                   </tr>
                 )
               })}
             </tbody>
           </table>
+          <dialog id={`edit_Record`} className="modal" onClose={() => setSelectedRecord(null)}>
+            {selectedRecord !== null && <EditRecordModel record={table.find(item => item.id === selectedRecord.id)!} />}
+          </dialog>
         </div>}
     </div>
   )
@@ -103,7 +105,7 @@ const EditRecordModel = ({ record }: { record: Record }) => {
       .finally(() => {
         e.disabled = false
         handleOnClose()
-        const dialog = document.getElementById(`edit_Record_${record.id}`) as HTMLDialogElement
+        const dialog = document.getElementById(`edit_Record`) as HTMLDialogElement
         dialog.close()
       })
   }
@@ -125,7 +127,7 @@ const EditRecordModel = ({ record }: { record: Record }) => {
       .finally(() => {
         e.disabled = false
         handleOnClose()
-        const dialog = document.getElementById(`edit_Record_${record.id}`) as HTMLDialogElement
+        const dialog = document.getElementById(`edit_Record`) as HTMLDialogElement
         dialog.close()
       })
   }
@@ -174,7 +176,7 @@ const EditRecordModel = ({ record }: { record: Record }) => {
             type="text"
             placeholder="Note (Optional)"
             className="input input-bordered focus:outline-0 input-sm w-full max-w-xs"
-            value={recordInfo.note}
+            value={recordInfo.note || ""}
             onChange={e => setRecordInfo({ ...recordInfo, note: e.currentTarget.value })}
           />
           <div className='flex flex-row justify-between'>

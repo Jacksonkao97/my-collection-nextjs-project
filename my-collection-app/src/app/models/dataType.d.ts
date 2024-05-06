@@ -17,3 +17,13 @@ export interface Record {
   season?: number,
   note?: string,
 }
+
+export interface Item {
+  id: string,
+  title: string,
+  type: string,
+  episode: number,
+  season: number,
+  image?: string,
+  imageType?: string,
+}

@@ -8,6 +8,7 @@ interface recordProps {
   episode?: Number,
   season?: Number,
   note?: string,
+  itemId?: string
 }
 
 const addRecord = async (props: recordProps) => {
@@ -21,7 +22,8 @@ const addRecord = async (props: recordProps) => {
       type: props.type,
       episode: props.episode,
       season: props.season,
-      note: props.note
+      note: props.note,
+      itemId: props.itemId
     })
   })
     .then(async (res) => {

@@ -12,7 +12,7 @@ interface CollectionListProps {
 }
 
 const CollectionList = (props: CollectionListProps) => {
-  const [collections, setCollections] = useState<Collection[]>([])
+  const [collections, setCollections] = useState<Collection[]>(props.collections)
   const [search, setSearch] = useState<string>('')
   const handleOnSearch = (e: HTMLInputElement) => {
     setSearch(e.value)

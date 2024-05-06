@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import deleteCollection from "@/app/actions/deleteCollection"
 
 // Assets
-import DeleteIcon from '../../../public/delete.png'
+import DeleteIcon from '@/app/assets/delete.svg'
 
 const DeleteCollectionBtn = (props: { collectionId: string, collectionName: string }) => {
   const handleOnDelete = () => {
